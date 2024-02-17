@@ -1,0 +1,340 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block main %}
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var carousel = document.getElementById('carousel');
+		var prevButton = document.getElementById('prevButton');
+		var nextButton = document.getElementById('nextButton');
+
+		var scrollPerClick = 300; // میزان اسکرول در هر کلیک
+
+		// نمایش یا مخفی کردن دکمه‌ها بر اساس موقعیت اسکرول
+		var checkButtons = function () {
+			prevButton.style.display = carousel.scrollLeft > 0 ? 'block' : 'none';
+			nextButton.style.display = carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth ? 'block' : 'none';
+		};
+
+		// اسکرول به سمت چپ
+		prevButton.addEventListener('click', function () {
+			carousel.scrollBy({ left: -scrollPerClick, behavior: 'smooth' });
+			// به‌روزرسانی موقعیت اسکرول بعد از انیمیشن
+			setTimeout(checkButtons, 200);
+		});
+
+		// اسکرول به سمت راست
+		nextButton.addEventListener('click', function () {
+			carousel.scrollBy({ left: scrollPerClick, behavior: 'smooth' });
+			// به‌روزرسانی موقعیت اسکرول بعد از انیمیشن
+			setTimeout(checkButtons, 200);
+		});
+
+		// اولین بررسی دکمه‌ها
+		checkButtons();
+	});
+</script>
+<div class="slider movie-items">
+	<div class="container">
+		<div class="row">
+			<div class="social-link">
+				<p>Follow us: </p>
+				<a href="#"><i class="ion-social-facebook"></i></a>
+				<a href="#"><i class="ion-social-twitter"></i></a>
+				<a href="#"><i class="ion-social-googleplus"></i></a>
+				<a href="#"><i class="ion-social-youtube"></i></a>
+			</div>
+			<div class="slick-multiItemSlider">
+				{% for movie in movies %}
+				<div class="movie-item">
+					<div class="mv-img">
+						<a href="{% url 'movie-detail' slug=movie.slug %}">
+							<img src="{{ movie.poster }}" alt="{{ movie.title }}" width="285" height="437">
+						</a>
+					</div>
+					<div class="title-in">
+						<div class="cate">
+							<!-- فرض می‌شود که هر فیلم دارای فیلد ژانرهای متعدد است -->
+							{% for genre in movie.genres.all %}
+							<span class="blue"><a href="#">{{ genre.name }}</a></span>
+							{% endfor %}
+						</div>
+						<h6><a href="#">{{ movie.title }}</a></h6>
+						<p><i class="ion-android-star"></i><span>{{ movie.average_rating|floatformat:1 }}</span> /5</p>
+					</div>
+				</div>
+				{% empty %}
+				<p>هیچ فیلمی یافت نشد.</p>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+<div class="movie-items">
+	<div class="container">
+		<div class="row ipad-width">
+			<div class="col-md-12">
+				<div class="title-hd">
+					<h2>in theater</h2>
+					<a href="#" class="viewall">View all <i class="ion-ios-arrow-right"></i></a>
+				</div>
+				<div class="tabs">
+					<style>
+						.tab-links {
+							list-style-type: none;
+							margin: 0;
+							padding: 0;
+							overflow: hidden;
+							background-color: #333;
+							/* Dark background color */
+						}
+
+						.tab-links li {
+							float: left;
+							/* Align tabs to the left side */
+						}
+
+						.tab-links li a {
+							display: block;
+							color: white;
+							/* White text color */
+							text-align: center;
+							padding: 14px 16px;
+							/* Padding inside each tab */
+							text-decoration: none;
+							font-family: 'Tahoma', sans-serif;
+							/* Font family */
+							font-size: 16px !important;
+							/* Font size */
+							transition: 0.3s;
+							/* Transition effect for hover */
+						}
+
+						.tab-links li a:hover {
+							background-color: red;
+							/* Light grey background on hover */
+							color: black;
+							/* Black text color on hover */
+						}
+
+						.tab-links .active a {
+							background-color: #04AA6D;
+							/* Green background for the active tab */
+							color: white;
+							/* White text color for the active tab */
+						}
+					</style>
+					<ul class="tab-links">
+						<li class="active"><a href="#tab1">به تازگی</a></li>
+						<li><a href="#tab2">جدیدترین</a></li>
+						<li><a href="#tab3">محبوب</a></li>
+						<li><a href="#tab4">بیشترین امتیاز</a></li>
+						<li><a href="#tab5">بزودی</a></li>
+						<li><a href="#tab6"> imdb</a></li>
+					</ul>
+					<div class="tab-content">
+						<style>
+							.movie-items .movie-item .mv-img {
+								position: relative;
+								margin-top: 10%;
+							}
+						</style>
+						<script>
+
+						</script>
+
+						<div id="tab1" class="tab active">
+							<div class="row">
+								<div class="slick-multiItemSlider">
+									<div class="slide-it">
+										<div id="carouselContainer" class="carousel-container">
+											<div id="carousel" class="carousel">
+												{% for related_movie in created_at %}
+												<div class="movie-item">
+													<div class="mv-img">
+														<img src="{{ related_movie.poster }}"
+															alt="{{ related_movie.title }}" width="200" height="350">
+													</div>
+													<div class="hvr-inner">
+														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+													</div>
+													<div class="title-in">
+														<h6 class='carousel-title'><a class='carousel-title' href="#">
+															{{related_movie.title }}</a></h6>
+														<p class='crasol-rat'><i class="ion-android-star"></i><span>
+															{{related_movie.average_rating|floatformat:1 }}</span> /5
+														</p>
+													</div>
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="tab2" class="tab">
+							<div class="row">
+								<div class="slick-multiItemSlider">
+									<div class="slide-it">
+										<div id="carouselContainer" class="carousel-container">
+											<div id="carousel" class="carousel">
+												{% for related_movie in release_date %}
+												<div class="movie-item">
+													<div class="mv-img">
+														<img src="{{ related_movie.poster }}"
+															alt="{{ related_movie.title }}" width="200" height="350">
+													</div>
+													<div class="hvr-inner">
+														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+													</div>
+													<div class="title-in">
+														<h6 class='carousel-title'><a class='carousel-title' href="#">
+															{{related_movie.title }}</a></h6>
+														<p class='crasol-rat'><i class="ion-android-star"></i><span>
+															{{related_movie.average_rating|floatformat:1 }}</span> /5
+														</p>
+													</div>
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="tab3" class="tab">
+							<div class="row">
+								<div class="slick-multiItemSlider">
+									<div class="slide-it">
+										<div id="carouselContainer" class="carousel-container">
+											<div id="carousel" class="carousel">
+												{% for related_movie in popular_movies %}
+												<div class="movie-item">
+													<div class="mv-img">
+														<img src="{{ related_movie.poster }}"
+															alt="{{ related_movie.title }}" width="200" height="350">
+													</div>
+													<div class="hvr-inner">
+														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+													</div>
+													<div class="title-in">
+														<h6 class='carousel-title'><a class='carousel-title' href="#">
+															{{related_movie.title }}</a></h6>
+														<p class='crasol-rat'><i class="ion-android-star"></i><span>
+															{{related_movie.average_rating|floatformat:1 }}</span> /5
+														</p>
+													</div>
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="tab4" class="tab">
+							<div class="row">
+								<div class="slick-multiItemSlider">
+									<div class="slide-it">
+										<div id="carouselContainer" class="carousel-container">
+											<!-- کراسل آیتم‌ها -->
+											<div id="carousel" class="carousel">
+												{% for related in top_rated_movies %}
+												<div class="movie-item">
+													<div class="mv-img">
+														<img src="{{ related.poster }}" alt="{{ related.title }}"
+															width="200" height="350">
+													</div>
+													<div class="hvr-inner">
+														<a href="{% url 'movie-detail' slug=related.slug %}"> بیشتر <i
+																class="ion-android-arrow-dropright"></i> </a>
+													</div>
+													<div class="title-in">
+														<h6 class='carousel-title'><a class='carousel-title' href="#">
+															{{related.title }}</a></h6>
+														<p class='crasol-rat'><i class="ion-android-star"></i><span>
+															{{related.average_rating|floatformat:1 }}</span> /5</p>
+													</div>
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div id="tab5" class="tab">
+							<div class="row">
+								<div class="slick-multiItemSlider">
+									<div class="slide-it">
+										<div id="carouselContainer" class="carousel-container">
+											<div id="carousel" class="carousel">
+												{% for related in coming_soon_movies %}
+												<div class="movie-item">
+													<div class="mv-img">
+														<img src="{{ related.poster }}" alt="{{ related.title }}"
+															width="200" height="350">
+													</div>
+													<div class="hvr-inner">
+														<a href="{% url 'movie-detail' slug=related.slug %}"> بیشتر <i
+																class="ion-android-arrow-dropright"></i> </a>
+													</div>
+													<div class="title-in">
+														<h6 class='carousel-title'><a class='carousel-title' href="#">
+															{{related.title }}</a></h6>
+														<p class='crasol-rat'><i class="ion-android-star"></i><span>
+															{{related.average_rating|floatformat:1 }}</span> /5</p>
+													</div>
+												</div>
+												{% endfor %}
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div id="tab6" class="tab">
+							<div class="row">
+							  <div class="slick-multiItemSlider">
+								<div class="slide-it">
+								  <div id="carouselContainer" class="carousel-container">
+									<div id="carousel" class="carousel">
+									  {% for movie, movie_data in top_rated_movies_data %}
+									  <div class="movie-item">
+										<div class="mv-img">
+										  <!-- استفاده از پوستر ارائه شده توسط OMDB -->
+										  <img src="{{ movie_data.Poster }}" alt="{{ movie.title }}" width="200" height="350">
+										</div>
+										<div class="hvr-inner">
+										  <!-- لینک به صفحه جزئیات فیلم -->
+										  <a href="{% url 'movie-detail' slug=movie.slug %}"> بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+										</div>
+										<div class="title-in">
+										  <h6 class='carousel-title'><a class='carousel-title' href="#">
+										  {{ movie.title }}</a></h6>
+										  <!-- نمایش رتبه ارائه شده توسط OMDB، اگر موجود باشد -->
+										  <p class='crasol-rat'><i class="ion-android-star"></i><span>
+										  {{ movie_data.imdbRating }}</span> /10</p>
+										</div>
+									  </div>
+									  {% endfor %}
+									</div>
+								  </div>
+								</div>
+							  </div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+</div>
+{% endblock main %}

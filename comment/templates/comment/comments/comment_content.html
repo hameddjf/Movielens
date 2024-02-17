@@ -1,0 +1,213 @@
+{% load comment_tags %}
+{% load i18n %}
+{% load gravatar %}
+
+<style>
+    .top-left-corner {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+    }
+
+    .username-style {
+        margin-right: 5px;
+        white-space: nowrap;
+    }
+
+    .time-info {
+        float: left;
+        margin-left: 15px;
+        direction: rtl;
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    .reply-button {
+        padding: 5px 10px;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        color: #007bff;
+        background-color: transparent;
+        cursor: pointer;
+        text-decoration: none;
+        margin-right: 5px;
+        font-size: 0.9rem;
+        transition: all 0.2s ease-in-out;
+        position: absolute;
+        bottom: 0px;
+        right: 480px;
+    }
+
+    .reply-button:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
+    .d-none {
+        display: none;
+    }
+
+    .comment-actions-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .reply-button-container {
+        order: 1;
+        flex-grow: 1;
+        text-align: left;
+    }
+
+    .reactions {
+        order: 2;
+        flex-grow: 1;
+        text-align: right;
+    }
+
+    .comment-actions-container {
+        position: relative;
+    }
+
+    
+</style>
+
+<script>
+    function toggleReplies(commentId) {
+        var replyForm = document.getElementById('reply-form-' + commentId);
+        var replyButton = document.querySelector('[onclick="toggleReplies(\'' + commentId + '\')"]');
+        
+        // تغییر وضعیت نمایش فرم پاسخ
+        if (replyForm.classList.contains('d-none')) {
+            replyForm.classList.remove('d-none');
+            replyButton.classList.add('active');
+        } else {
+            replyForm.classList.add('d-none');
+            replyButton.classList.remove('active');
+            // اضافه کردن موارد دیگر اگر نیاز به بازنشانی تغییرات دیگری دارید
+        }
+    }
+    function onReplyFormSubmitted(event) {
+        event.preventDefault(); // جلوگیری از ارسال معمولی فرم
+    
+        // انجام پردازش‌های لازم برای ارسال اطلاعات
+        // ...
+    
+        // بازنشانی فرم و برداشتن کلاس‌های فعال
+        var replyForm = event.target; // فرمی که ارسال شده
+        var replyButton = replyForm.querySelector('.reply-button.active');
+        if (replyButton) {
+            replyButton.classList.remove('active');
+        }
+    
+        // مخفی کردن فرم پاسخ
+        replyForm.classList.add('d-none');
+    }
+    
+    // اضافه کردن شنودگر رویداد به فرم پاسخ
+    var replyForms = document.querySelectorAll('.reply-form');
+    replyForms.forEach(function(form) {
+        form.addEventListener('submit', onReplyFormSubmitted);
+    });
+    function toggleReplies(commentId) {
+        var replyForm = document.getElementById('reply-form-' + commentId);
+        var replyButton = document.querySelector('[onclick="toggleReplies(\'' + commentId + '\')"]');
+
+        if (replyForm.classList.contains('d-none')) {
+            replyForm.classList.remove('d-none');
+            replyButton.classList.add('active');
+        } else {
+            replyForm.classList.add('d-none');
+            replyButton.classList.remove('active');
+        }
+    }
+</script>
+
+<div id="{{ comment.urlhash }}" class="media-comment-dubble left-top js-updated-comment{% if comment.has_flagged_state %} flagged-comment{% endif %}{% block content_wrapper_cls %}{% if has_valid_profile %} col-9 col-md-10{% else %} col-11 mx-3{% endif %}{% endblock content_wrapper_cls %}">
+    {% block comment_content %}
+        {% if render_markdown %}
+            {% render_content comment markdown=True %}
+        {% else %}
+            {% render_content comment markdown=False %}
+        {% endif %}
+    {% endblock comment_content %}
+
+    {% get_username_for_comment comment as username %}
+    <div class="{% block footer_wrapper_cls %}mt-2 text-muted{% endblock footer_wrapper_cls %}">
+        <small>
+            <div class="top-left-corner">
+                {% get_profile_url comment as profile_url %}
+                <{% if comment.user %}a{% else %}span{% endif %} class="{% block username_cls %}{% endblock username_cls %}" {% if profile_url %}href="{{ profile_url }}"{% endif %} title="{% if comment.user %}{% blocktrans %}view {{ username }} profile{% endblocktrans %}{% else %}{% trans 'comment by anonymous user' %}{% endif %}">
+                    <img src="{% gravatar_url comment.user.email 30 %}" class="gravatar-image" alt="{{ comment.user.email }}">
+                    <span class="username-style">
+                        {% if comment.user.get_full_name %}
+                            {{ comment.user.get_full_name }}
+                        {% else %}
+                            {{ comment.user.username }}
+                        {% endif %}
+                    </span>
+                </{% if comment.user %}a{% else %}span{% endif %}>
+                <span class="time-info">
+                    {% if comment.is_edited %}
+                        <span class="font-italic" title="{% trans 'Edited' %}">
+                            {% blocktrans with edited_time=comment.edited|timesince %}ویرایش شده: {{ edited_time }} قبل{% endblocktrans %}
+                        </span>
+                    {% else %}
+                        <span class="font-italic" title="{% trans 'Posted' %}">
+                            {% with posted_time=comment.posted|timesince %}
+                                {% blocktrans trimmed %}
+                                    <strong>{{ posted_time }} قبل</strong>
+                                {% endblocktrans %}
+                            {% endwith %}
+                            
+                        </span>
+
+                        
+                    {% endif %}
+                </span> 
+
+            </div>
+            {% if user|can_block_users %}
+                {% include 'comment/block/block_icon.html' %}
+            {% endif %}
+            <div class="comment-actions">
+                {% if comment.is_parent %}
+                    {% get_replies_count comment user as reply_count %}
+                    | <span class="js-reply-number {% block reply_count_cls %}text-dark{% endblock reply_count_cls %}">{{ reply_count }}</span>
+                    <a class="js-reply-link {% block reply_link_cls %}btn btn-link ml-1{% endblock reply_link_cls %}" href="#">
+                        : تعداد پاسخ
+                    </a>
+                    {% if comment.user == user and is_subscription_allowed %}
+                        <div class="{% block follow_icon_wrapper_cls %}d-inline ml-3{% endblock follow_icon_wrapper_cls %}">
+                            {% include 'comment/follow/follow.html' with model_object=comment btnId=comment.id %}
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="comment-actions-container">
+                {% if comment.is_parent and not comment.is_reply %}
+                    <div class="reply-button-container">
+                        <button type="button" class="reply-button" onclick="toggleReplies('{{ comment.id }}')"><strong>پاسخ به این نظر</strong></button>
+                    </div>
+                {% endif %}
+                <div class="reactions">
+                    {% include "comment/reactions/reactions.html" with comment=comment %}
+                </div>
+            </div>
+            <div id="reply-form-{{ comment.id }}" class="reply-form d-none">
+                {% include 'comment/comments/create_comment.html' with placeholder=placeholder %}
+            </div>
+
+            {% get_comment_replies comment user as replies %}
+
+                {% for comment in replies %}
+                    {% include 'comment/comments/child_comment.html' %}
+                {% endfor %}
+            <!-- فرم ایجاد کامنت که در ابتدا مخفی است و با کلیک روی دکمه پاسخ نمایش داده می‌شود -->
+
+        </small>
+    </div>
+</div>

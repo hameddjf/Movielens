@@ -1,0 +1,173 @@
+{% load i18n %}
+{% block rating_style %}
+<style>
+    #{{ id }} .star-ratings-rating-full, #{{ id }} .star-ratings-rating-empty {
+        width: {{ icon_width }}px;
+        height: {{ icon_height }}px;
+        background: url({{ sprite_image }}) no-repeat;
+        background-size: {{ sprite_width }}px;
+    }
+
+    #{{ id }} .star-ratings-rating-empty {
+        background-position: -{{ icon_width }}px 0;
+    }
+
+    {% if user.is_authenticated and editable %}
+    #{{ id }} .star-ratings-rating-full:hover, #{{ id }} .star-ratings-rating-empty:hover {
+        background-position: -{{ icon_width|add:icon_width }}px 0;
+    }
+    {% endif %}
+</style>
+{% endblock rating_style %}
+
+
+{% comment %} ----------------------- {% endcomment %}
+{% block rating_container %}
+<div id="{{ id }}" class="star-ratings" data-max-rating="{{ star_count }}" data-avg-rating="{{ rating.average }}">
+    {% block rating_stars %}
+    <div class="star-ratings-rating-stars-container">
+        <ul class="star-ratings-rating-background">
+            {% for star in stars %}
+                <li>
+                {% comment %} {% if editable %} {% endcomment %}
+                <form action="{% url 'ratings:rate' rating.content_type_id rating.object_id %}" class="star-ratings-rate-action" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" value="{{ star }}" name="score">
+                    <input type="hidden" value="{{ request.path }}" name="next">
+                    <button type="submit" class="star-ratings-rating-empty" data-score="{{ star }}" title="Tooltips for rating: {{ star }}"></button>
+                </form>
+                {% comment %} {% elif user.is_authenticated %} {% endcomment %}
+                <span class="star-ratings-rating-empty" title="Tooltips for rating: {{ star }}"></span>
+                {% comment %} {% else %} {% endcomment %}
+                <span class="star-ratings-rating-empty" title="{% trans 'برای رای دادن وارد شوید' as title_login %}{{ title_login|escape }}"></span>
+                {% comment %} {% endif %} {% endcomment %}
+                </li>
+            {% endfor star %}
+          </ul>
+          <style>
+            
+            .star-ratings-rating-background {
+              display: flex;
+              flex-direction: row;
+              justify-content: flex-start;
+              align-items: center;
+              margin-bottom: -27px; /* تنظیم فاصله پایین */
+            }
+            
+            .star-ratings-rating-background li {
+              margin-right: 5px; /* تنظیم فاصله بین عناصر */
+            }
+            .star-ratings-wrapper {
+                display: flex;
+                align-items: center;
+            }
+            
+            .star-ratings-wrapper {
+                display: flex;
+                align-items: flex-start; /* تنظیم تراز بندی عناصر در بالا */
+            }
+            
+            .star-ratings-stars {
+                /* سبک‌های مربوط به ایکون‌های ستاره‌ای */
+                /* مثلاً اگر خواستید یک حاشیه دور ستاره‌ها اضافه کنید یا سایز آن‌ها را تنظیم کنید */
+            }
+            
+            .star-ratings-details {
+                /* سایر جزئیات امتیازدهی را نمایش نمی‌دهیم */
+                display: none;
+            }
+
+            .star-ratings-rating-average {
+                position: relative;
+                left: -123%;
+                top: -8px; /* اضافه کردن 10 پیکسل برای جابجایی به سمت بالا */
+                font-size: 1.5rem;
+                color: white;
+                padding: 5px;
+                margin-right: 20px;
+                /* float: left; حذف float اگر نیازی به آن نیست */
+            }
+            /* در صورت نیاز به اضافه کردن ریسپانسیو بودن */
+            @media (max-width: 768px) {
+                .star-ratings-rating-average {
+                    left: 0;
+                    position: static; /* در صفحات کوچکتر، موقعیت‌دهی را به حالت عادی برمی‌گردانیم */
+                }
+            }
+            .rating-scale {
+                font-size: 0.8em; /* یا هر اندازه‌ای که می‌خواهید برای "5" اعمال شود */
+                position: relative;
+                top: 4px;
+              }
+            </style>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    // افزودن شنودگر رویداد 'mouseenter' به هر دکمه ستاره
+                    document.querySelectorAll('.star-ratings-rate-action button').forEach(function(starButton, index, starButtons) {
+                        starButton.addEventListener('mouseenter', function() {
+                            // پر کردن تمام ستاره‌ها تا ستاره‌ای که ماوس روی آن قرار دارد
+                            for (let i = 0; i <= index; i++) {
+                                starButtons[i].classList.add('star-ratings-rating-full');
+                                starButtons[i].classList.remove('star-ratings-rating-empty');
+                            }
+                            // اطمینان از خالی بودن ستاره‌های بعد از ستاره‌ای که ماوس روی آن قرار دارد
+                            for (let i = index + 1; i < starButtons.length; i++) {
+                                starButtons[i].classList.add('star-ratings-rating-empty');
+                                starButtons[i].classList.remove('star-ratings-rating-full');
+                            }
+                        });
+                    });
+                
+                    // افزودن شنودگر رویداد 'mouseleave' به کل لیست ستاره‌ها برای ریست کردن ستاره‌ها
+                    document.querySelector('.star-ratings-rating-background').addEventListener('mouseleave', function() {
+                        document.querySelectorAll('.star-ratings-rate-action button').forEach(function(starButton) {
+                            starButton.classList.add('star-ratings-rating-empty');
+                            starButton.classList.remove('star-ratings-rating-full');
+                        });
+                    });
+                });
+                
+            </script>
+        {% comment %} <ul class="star-ratings-rating-foreground" style="width: {{ percentage|floatformat }}%">
+          {% for star in stars %}
+          <li>
+            {% if editable %}
+            <form action="{% url 'ratings:rate' rating.content_type_id rating.object_id %}" class="star-ratings-rate-action" method="post">
+              {% csrf_token %}
+              <input type="hidden" value="{{ star }}" name="score">
+              <input type="hidden" value="{{ request.path }}" name="next">
+              <button type="submit" class="star-ratings-rating-full" data-score="{{ star }}"></button>
+            </form>
+            {% else %}
+                        <span class="star-ratings-rating-full" title="برای رای دادن وارد شوید"></span>
+                    {% endif %}
+                    </li>
+                {% endfor %}
+            </ul> {% endcomment %}
+        </div>
+    {% endblock %}
+    {% block rating_detail %}
+{% comment %} ----------------------- {% endcomment %}
+{% comment %} {% trans 'Average: ' %} {% endcomment %}
+<div class="star-ratings-rating-average"> <span class='star-ratings-rating-value'>{{ rating.average|floatformat:"-1" }}<span class="rating-scale">/5</span></span></div>
+
+<div class="star-ratings-details">
+    <div class="star-ratings-rating-count">{% trans 'Rating Count: ' %} <span class='star-ratings-rating-value'>{{ rating.count }}</span></div>
+    <div class="star-ratings-rating-user">{% trans 'You Rated: ' %} <span class='star-ratings-rating-value' data-when-null="{% trans 'Not rated' %}">{% if user_rating %}{{ user_rating.score }}{% else %}{% trans 'Not rated' %}{% endif %}</span></div>
+    {% if not user.is_authenticated and not anonymous_ratings and not read_only %}
+        <p>{% trans 'Please log in to rate.' %}</p>
+    {% endif %}
+    {% if clearable %}
+        <div class="star-ratings-clear star-ratings-clear-{{ user_rating|yesno:'visible,hidden' }}">
+            <form action="{% url 'ratings:rate' rating.content_type_id rating.object_id %}" class="star-ratings-rate-action" method="post">
+                {% csrf_token %}
+                <input type="hidden" value="1" name="clear">
+                <input type="hidden" value="{{ request.path }}" name="next">
+                <button type="submit" class="star-ratings-rating-clear">Clear</button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+    {% endblock rating_detail %}
+</div>
+{% endblock rating_container %}

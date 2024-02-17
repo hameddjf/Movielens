@@ -1,0 +1,321 @@
+{% extends "main/base.html" %}
+
+{% load comment_tags %}  {# Loading the template tag #}
+{% load ratings %}
+{% block main %}
+
+<div class="hero mv-single-hero">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+			</div>
+		</div>
+	</div>
+</div>
+<div class="page-single movie-single movie_single">
+	<div class="container">
+		<div class="row ipad-width2">
+			<div class="col-md-4 col-sm-12 col-xs-12">
+				<div class="movie-img sticky-sb">
+					<img src="{{movie.poster}}" alt="{{movie.title}}">
+					<div class="movie-btn">	
+						<div class="btn-transform transform-vertical red">
+							<div><a href="#" class="item item-1 redbtn"> <i class="ion-play"></i> تماشا</a></div>
+							<div><a href="https://www.youtube.com/embed/o-0hcF97wy0" class="item item-2 redbtn fancybox-media hvr-grow"><i class="ion-play"></i></a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-8 col-sm-12 col-xs-12">
+				<div class="movie-single-ct main-content">
+					<h1 class="bd-hd">{{movie.title}} 
+						<!--<span>{{ movie.release_date|date:"Y F d" }}</span>-->
+					</h1>
+					<div class="social-btn">
+						<a href="#" class="parent-btn"><i class="ion-heart"></i> Add to Favorite</a>
+						<div class="hover-bnt">
+							<a href="#" class="parent-btn"><i class="ion-android-share-alt"></i>share</a>
+							<div class="hvr-item">
+								<a href="#" class="hvr-grow"><i class="ion-social-facebook"></i></a>
+								<a href="#" class="hvr-grow"><i class="ion-social-twitter"></i></a>
+								<a href="#" class="hvr-grow"><i class="ion-social-googleplus"></i></a>
+								<a href="#" class="hvr-grow"><i class="ion-social-youtube"></i></a>
+							</div>
+						</div>		
+					</div>
+					<div class="movie-rate">
+						<div class="rate">
+							<i class="ion-android-star"></i>
+							<p> {{ movie.average_rating|floatformat:"1" }} </p>
+							</p>
+						</div>
+						<div class="rate-star">
+							<p>Rate This Movie:  </p>
+							<div> {% ratings object %} </div>
+						</div>
+					</div>
+					<div class="movie-tabs">
+						<div class="tabs">
+							<ul class="tab-links tabs-mv">
+								<li class="active"><a href="#overview">Overview</a></li>
+								<li><a href="#reviews"> Reviews</a></li>
+								<li><a href="#media"> Media</a></li> 
+							</ul>
+						    <div class="tab-content">
+						        <div id="overview" class="tab active">
+						            <div class="row">
+						            	<div class="col-md-8 col-sm-12 col-xs-12">
+						            		<p>{{movie.description}}.</p>
+											{% with movie.episodes.all as episodes %}
+												{% if episodes|length == 1 %}
+													<!-- اگر فقط یک ویدیو یا فصل وجود داشته باشد، این بخش اجرا می‌شود -->
+													<div class="title-hd-sm">
+													<h4>دانلود</h4>
+													<!-- لینک به صفحه با تمام ویدیوها و تصاویر -->
+													</div>
+												{% endif %}
+
+												{% for episode in episodes %}
+													{% if forloop.first and episodes|length > 1 %}
+													<!-- این بخش فقط در اولین اجرای حلقه و فقط اگر بیش از یک ویدیو یا فصل وجود داشته باشد، اجرا می‌شود -->
+													<div class="title-hd-sm">
+														<h4>دانلود فصل {{ episode.season }}</h4>
+														<!-- لینک به صفحه با تمام ویدیوها و تصاویر -->
+													</div>
+													{% endif %}
+													<div class="download-section">
+													<div class="download-item" style="border-left: 5px solid {{ episode.color }}">
+														<!-- ستون کیفیت -->
+														<span class="quality-indicator">
+														{{ episode.quality }}
+														</span>
+														<!-- ستون دانلود -->
+														<a href="{{ episode.file.url }}" class="item yellowbtn rainbow-animation" download>
+														<i class="ion-card"></i> دانلود قسمت {{ episode.title }}
+														</a>
+													</div>
+													</div>
+												{% endfor %}
+											{% endwith %}
+											<div class="mvsingle-item ov-item">
+												<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image11.jpg" ><img src="images/uploads/image1.jpg" alt=""></a>
+												<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image21.jpg" ><img src="images/uploads/image2.jpg" alt=""></a>
+												<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image31.jpg" ><img src="images/uploads/image3.jpg" alt=""></a>
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/image4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+											</div>
+											
+											<!-- movie user review -->
+											<div class="mv-user-review-item">
+												<div class="no-star">
+												</div>
+												<p class="time">
+												</p>
+											</div>
+						            	</div>
+						            	<div class="col-md-4 col-xs-12 col-sm-12">
+						            		<div class="sb-it">
+						            			<h6>کارگردان : </h6>
+						            			<p><a href="#">{{movie.director}}</a></p>
+						            		</div>
+											<div class="sb-it">
+												<h6>بازیگران : </h6>
+												<div>
+												  {% for actor in movie.actor.all %}
+												  <div class="actor-container">
+													<a href="#">
+													  <span class="actor-name">{{ actor.name }}</span>
+													  {% comment %} نمایش تصویر بازیگر {% endcomment %}
+													  {% comment %} <img src="{{ actor.poster.url }}" alt="{{ actor.name }}" class="actor-image"> {% endcomment %}
+													</a>
+												  </div>
+												  {% endfor %}
+												</div>
+											  </div>
+											  
+											  <style>
+											  .actor-container {
+												margin-bottom: 10px; /* فاصله پایین برای جداسازی بلوک‌های بازیگر */
+											  }
+											  
+											  .actor-image {
+												width: 70px; /* تنظیم عرض تصویر */
+												margin: 5px;
+												height: auto; /* تنظیم ارتفاع تصویر بر اساس عرض */
+												vertical-align: middle; /* قرار دادن تصویر در مرکز عمودی نسبت به متن */
+												{% comment %} display: block; /* نمایش تصویر در خط جدید */ {% endcomment %}
+											  }
+											  
+											  .actor-name {
+												display: inline-block; /* نمایش نام بازیگر در خط مشابه تصویر */
+												vertical-align: middle; /* قرار دادن نام بازیگر در مرکز عمودی نسبت به تصویر */
+												margin-right: 5px; /* افزودن فاصله کمی بین نام بازیگر و تصویر */
+											  }
+											  </style>
+						            		<div class="sb-it">
+						            			<h6>ژانر:</h6>
+												{% for Genre in movie.genres.all %}
+													<p><a href="#">{{ Genre }}</a>{% if not forloop.last %}, {% endif %}</p>
+												{% endfor %}
+						            		</div>
+						            		<div class="sb-it">
+						            			<h6>تاریخ اکران :</h6>
+						            			<p>&ltr{{movie.release_date}}</p>
+						            		</div>
+						            		<div class="sb-it">
+						            			<h6>مدت زمان :</h6>
+						            			<p>{{movie.duration}} min</p>
+						            		</div>
+						            		<div class="sb-it">
+						            			<h6>Plot Keywords:</h6>
+						            			<p class="tags">
+						            			</p>
+						            		</div>
+						            		<div class="ads">
+											</div>
+						            	</div>
+						            </div>
+						        </div>
+						        <div id="reviews" class="tab review">
+						           <div class="row">
+						            	<div class="rv-hd">
+						            		<div class="div">
+							            		<h3>نظرات</h3>
+							            	</div>
+						            	</div>
+						            	
+										{% render_comments object request %}  
+						            </div>
+						        </div>
+					       	 	<div id="media" class="tab">
+						        	<div class="row">
+						        		<div class="rv-hd">
+						            		<div>
+						            			<h3>Videos & Photos of</h3>
+					       	 					<h2>Skyfall: Quantum of Spectre</h2>
+						            		</div>
+						            	</div>
+						            	<div class="title-hd-sm">
+											<h4>Videos <span>(8)</span></h4>
+										</div>
+										<div class="mvsingle-item media-item">
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item1.jpg" alt="">
+													<a class="fancybox-media hvr-grow"  href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Trailer:  Watch New Scenes</a></h6>
+													<p class="time"> 1: 31</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item2.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Featurette: “Avengers Re-Assembled</a></h6>
+													<p class="time"> 1: 03</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item3.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Robert Downey Jr</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Scarlett Johansson</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item1.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Featurette: Meet Quicksilver & The Scarlet Witch</a></h6>
+													<p class="time"> 1: 31</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item2.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Director Joss Whedon</a></h6>
+													<p class="time"> 1: 03</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item3.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Interview: Mark Ruffalo</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+											<div class="vd-item">
+												<div class="vd-it">
+													<img class="vd-img" src="images/uploads/vd-item4.jpg" alt="">
+													<a class="fancybox-media hvr-grow" href="https://www.youtube.com/embed/o-0hcF97wy0"><img src="images/uploads/play-vd.png" alt=""></a>
+												</div>
+												<div class="vd-infor">
+													<h6> <a href="#">Official Trailer #2</a></h6>
+													<p class="time"> 3:27</p>
+												</div>
+											</div>
+										</div>
+										<div class="title-hd-sm">
+											<h4>Photos <span> (21)</span></h4>
+										</div>
+										<div class="mvsingle-item">
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image11.jpg" ><img src="images/uploads/image1.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery"  href="images/uploads/image21.jpg" ><img src="images/uploads/image2.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image31.jpg" ><img src="images/uploads/image3.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image41.jpg" ><img src="images/uploads/image4.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image51.jpg" ><img src="images/uploads/image5.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image61.jpg" ><img src="images/uploads/image6.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image71.jpg" ><img src="images/uploads/image7.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image81.jpg" ><img src="images/uploads/image8.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image91.jpg" ><img src="images/uploads/image9.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image101.jpg" ><img src="images/uploads/image10.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image111.jpg" ><img src="images/uploads/image1-1.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image121.jpg" ><img src="images/uploads/image12.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image131.jpg" ><img src="images/uploads/image13.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image141.jpg" ><img src="images/uploads/image14.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image151.jpg" ><img src="images/uploads/image15.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image161.jpg" ><img src="images/uploads/image16.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image171.jpg" ><img src="images/uploads/image17.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image181.jpg" ><img src="images/uploads/image18.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image191.jpg" ><img src="images/uploads/image19.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image201.jpg" ><img src="images/uploads/image20.jpg" alt=""></a>
+											<a class="img-lightbox"  data-fancybox-group="gallery" href="images/uploads/image211.jpg" ><img src="images/uploads/image2-1.jpg" alt=""></a>
+										</div>
+						        	</div>
+					       	 	</div>
+						    </div> 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock main %}

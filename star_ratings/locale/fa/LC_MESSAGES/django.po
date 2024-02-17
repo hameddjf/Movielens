@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-20 18:27+0330\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+#: .\star_ratings\admin.py:21
+msgid "Score"
+msgstr ""
+
+#: .\star_ratings\admin.py:39
+msgid "Rating average"
+msgstr ""
+
+#: .\star_ratings\models.py:21
+msgid ""
+"User is mandatory. Enable 'STAR_RATINGS_ANONYMOUS' for anonymous ratings."
+msgstr ""
+
+#: .\star_ratings\models.py:54
+msgid "Already rated."
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:43
+msgid "برای رای دادن وارد شوید"
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:73
+msgid "Average: "
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:76
+msgid "Rating Count: "
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:79
+msgid "You Rated: "
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:79
+msgid "Not rated"
+msgstr ""
+
+#: .\star_ratings\templates\star_ratings\widget_base.html:81
+msgid "Please log in to rate."
+msgstr ""

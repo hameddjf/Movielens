@@ -1,0 +1,152 @@
+.download-item {
+    margin-bottom: 60px; /* فاصله پایین برای هر دکمه دانلود */
+  }
+
+.title-hd-sm {
+    text-align: left !important;
+    justify-content: end;
+
+  }
+
+.title-container {
+    display: flex;
+    justify-content: space-between;
+    direction: rtl;
+    text-align: right;
+  }
+  
+.download-section {
+    direction: rtl; 
+    text-align: right;
+    color: aquamarine;
+  }
+
+.download-item {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center;
+    background-color: #333; 
+    padding: 2px;
+    margin-bottom: 7px;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1); 
+  }
+  
+  
+.download-item a {
+    text-decoration: none;
+    /* استایل‌های اضافی مورد نیاز برای لینک دانلود */
+  }
+
+@keyframes rainbow {
+  0% { border-color: red; }
+  14% { border-color: orange; }
+  28% { border-color: yellow; }
+  42% { border-color: green; }
+  56% { border-color: blue; }
+  70% { border-color: indigo; }
+  84% { border-color: violet; }
+  100% { border-color: red; }
+  }
+  
+.rainbow-animation {
+    animation: rainbow 2s linear infinite;
+    border-radius: 5px; /* دور گرد برای حاشیه */
+    padding: 5px;
+  }
+  
+.download-item a {
+    color: #08245d; 
+    text-decoration: none;
+    display: inline-block; /* نیاز است تا انیمیشن بر روی لینک اعمال شود */
+    margin: 10px; /* فاصله از المان‌های دیگر */
+    border: 2px solid transparent; /* حاشیه شفاف ابتدایی */
+    background-clip: padding-box; /* جلوگیری از فراتر رفتن پس‌زمینه از حاشیه */
+  }
+
+.quality-indicator {
+  color : white;
+}
+
+
+/* crasol */
+.carousel-container {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.carousel {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.movie-item {
+  display: inline-block;
+  margin-right: 10px; /* فضای بین آیتم‌ها را تنظیم کنید */
+  vertical-align: top; /* این خط را اضافه کردم تا تصاویر در یک ردیف قرار بگیرند */
+  width: 200px; /* اندازه عرض را برای هماهنگی با تصویر تنظیم کنید */
+  height: auto; /* ارتفاع را به صورت خودکار تنظیم کنید تا نسبت ابعاد حفظ شود */
+}
+
+/* اطمینان حاصل کنید که دکمه‌های کراسل با اندازه جدید تصاویر هماهنگ هستند */
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #fff;
+  border: none;
+  cursor: pointer;
+  z-index: 2; /* این خط را اضافه کردم تا دکمه‌ها روی تصاویر قرار بگیرند */
+  padding: 10px;
+  font-size: 24px;
+}
+
+.movie-items .movie-item .title-in h6 a {
+  font-size: 20px;
+}
+
+@keyframes rainbow-text {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.carousel-title-animated {
+  line-height: 4;
+  background: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  background-size: 200% auto;
+  color: transparent;
+  animation: rainbow-text 5s linear infinite;
+  -webkit-background-clip: text;
+  display: inline-block; /* لازم است تا انیمیشن به درستی کار کند */
+}
+
+.crasol-rat{
+  line-height: 2 !important;
+}
+
+.carousel-container {
+  position: relative;
+  /* ... سایر استایل‌ها ... */
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%; /* مکان عمودی دکمه‌ها در وسط کراسل */
+  transform: translateY(-50%); /* تنظیم مکان عمودی دکمه‌ها برای مرکزیت */
+  background-color: #fff; /* رنگ پس‌زمینه دکمه */
+  border: none; /* حذف استایل پیش‌فرض بردر */
+  cursor: pointer; /* تبدیل نشانگر موس به اشاره‌گر */
+  z-index: 2; /* اطمینان از اینکه دکمه‌ها بالای دیگر عناصر قرار می‌گیرند */
+  /* اضافه کردن padding و font-size برای بزرگ‌تر نشان دادن فلش‌ها */
+  padding: 10px;
+  font-size: 24px;
+}
+
+.prev-button {
+  left: 0; /* فاصله دکمه قبلی از سمت چپ کراسل */
+}
+
+.next-button {
+  right: 0; /* فاصله دکمه بعدی از سمت راست کراسل */
+}
