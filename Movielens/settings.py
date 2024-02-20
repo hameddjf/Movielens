@@ -28,6 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# url = 'http://www.omdbapi.com/?i=tt3896198&apikey=8ce0bd47'
+
+OMDB_API_KEY = os.getenv('OMDB_API_KEY', )  #  api_key از متغیر محیطی استفاده می‌کنیم برای 
+OMDB_API_URL = 'http://www.omdbapi.com/'  # URL پایه برای استفاده در درخواست‌ها
 
 # Application definition
 

@@ -54,7 +54,7 @@ class Movie(PolymorphicModel):
     director = models.ForeignKey("cast.Director", verbose_name=_("کارگردان"), blank=False, on_delete=models.CASCADE , default=1)
     actor = models.ManyToManyField("cast.Actor", verbose_name=_("بازیگران"), related_name='movies_actor', blank=True)
     description = models.TextField(_("توضیحات"), blank=True)
-    imdb_id = models.CharField(max_length=9, blank=True, null=True, unique=True, verbose_name='IMDb ID')
+    imdb_id = models.CharField(max_length=50, blank=True, null=True, unique=True, verbose_name='IMDb ID')
     imdb_rating = models.DecimalField(max_digits=3, decimal_places=1, blank=True, null=True, verbose_name='IMDb Rating')
     genres = models.ManyToManyField(Genre, verbose_name=_("ژانر"))
     duration = models.PositiveIntegerField(_("مدت زمان"), help_text=_("مدت زمان فیلم به دقیقه"), null=True, blank=True)

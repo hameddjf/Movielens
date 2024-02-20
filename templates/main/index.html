@@ -48,7 +48,7 @@
 				{% for movie in movies %}
 				<div class="movie-item">
 					<div class="mv-img">
-						<a href="{% url 'movie-detail' slug=movie.slug %}">
+						<a href="{% url 'base:movie-detail' slug=movie.slug %}">
 							<img src="{{ movie.poster }}" alt="{{ movie.title }}" width="285" height="437">
 						</a>
 					</div>
@@ -59,7 +59,7 @@
 							<span class="blue"><a href="#">{{ genre.name }}</a></span>
 							{% endfor %}
 						</div>
-						<h6><a href="#">{{ movie.title }}</a></h6>
+						<h6><a href="{% url 'base:movie-detail' slug=movie.slug %}">{{ movie.title }}</a></h6>
 						<p><i class="ion-android-star"></i><span>{{ movie.average_rating|floatformat:1 }}</span> /5</p>
 					</div>
 				</div>
@@ -156,11 +156,11 @@
 															alt="{{ related_movie.title }}" width="200" height="350">
 													</div>
 													<div class="hvr-inner">
-														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
 													</div>
 													<div class="title-in">
-														<h6 class='carousel-title'><a class='carousel-title' href="#">
+														<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															{{related_movie.title }}</a></h6>
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 															{{related_movie.average_rating|floatformat:1 }}</span> /5
@@ -187,11 +187,11 @@
 															alt="{{ related_movie.title }}" width="200" height="350">
 													</div>
 													<div class="hvr-inner">
-														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
 													</div>
 													<div class="title-in">
-														<h6 class='carousel-title'><a class='carousel-title' href="#">
+														<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															{{related_movie.title }}</a></h6>
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 															{{related_movie.average_rating|floatformat:1 }}</span> /5
@@ -218,11 +218,11 @@
 															alt="{{ related_movie.title }}" width="200" height="350">
 													</div>
 													<div class="hvr-inner">
-														<a href="{% url 'movie-detail' slug=related_movie.slug %}">
+														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															بیشتر <i class="ion-android-arrow-dropright"></i> </a>
 													</div>
 													<div class="title-in">
-														<h6 class='carousel-title'><a class='carousel-title' href="#">
+														<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															{{related_movie.title }}</a></h6>
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 															{{related_movie.average_rating|floatformat:1 }}</span> /5
@@ -250,11 +250,11 @@
 															width="200" height="350">
 													</div>
 													<div class="hvr-inner">
-														<a href="{% url 'movie-detail' slug=related.slug %}"> بیشتر <i
+														<a href="{% url 'base:movie-detail' slug=related.slug %}"> بیشتر <i
 																class="ion-android-arrow-dropright"></i> </a>
 													</div>
 													<div class="title-in">
-														<h6 class='carousel-title'><a class='carousel-title' href="#">
+														<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related.slug %}">
 															{{related.title }}</a></h6>
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 															{{related.average_rating|floatformat:1 }}</span> /5</p>
@@ -281,11 +281,11 @@
 															width="200" height="350">
 													</div>
 													<div class="hvr-inner">
-														<a href="{% url 'movie-detail' slug=related.slug %}"> بیشتر <i
+														<a href="{% url 'base:movie-detail' slug=related.slug %}"> بیشتر <i
 																class="ion-android-arrow-dropright"></i> </a>
 													</div>
 													<div class="title-in">
-														<h6 class='carousel-title'><a class='carousel-title' href="#">
+														<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 															{{related.title }}</a></h6>
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 															{{related.average_rating|floatformat:1 }}</span> /5</p>
@@ -312,10 +312,10 @@
 										</div>
 										<div class="hvr-inner">
 										  <!-- لینک به صفحه جزئیات فیلم -->
-										  <a href="{% url 'movie-detail' slug=movie.slug %}"> بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+										  <a href="{% url 'base:movie-detail' slug=movie.slug %}"> بیشتر <i class="ion-android-arrow-dropright"></i> </a>
 										</div>
 										<div class="title-in">
-										  <h6 class='carousel-title'><a class='carousel-title' href="#">
+										  <h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=movie.slug %}">
 										  {{ movie.title }}</a></h6>
 										  <!-- نمایش رتبه ارائه شده توسط OMDB، اگر موجود باشد -->
 										  <p class='crasol-rat'><i class="ion-android-star"></i><span>

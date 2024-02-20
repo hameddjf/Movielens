@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.urls import path 
 from .views import MovieListView , MovieDetailView , AverageRatingView , get_movie_data
 
+app_name = 'base'
 urlpatterns = [
     path("", MovieListView.as_view() , name = 'home'),
     path('movie/<slug:slug>/', MovieDetailView.as_view(), name='movie-detail'),  # اصلاح 'addres' به 'address'

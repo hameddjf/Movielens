@@ -39,16 +39,6 @@ class MovieListView(ListView):
     context_object_name = 'movies'
     paginate_by = 10  # تعداد فیلم‌ها در هر صفحه
 
-    # def get_object(self):
-    #     # میاد هرچی ک مال اسلاگه رو میگیره = هرمقداری اسلاگ داشت رو میگیره   تعریف اسلاگ
-    #     slug = self.kwargs.get('slug')
-    #     # اینجا تعیین کردیم که از مدل .. اسلاگ برابر با اسلاگه
-    #     article = get_object_or_404(Movie, slug=slug)
-    #     ip_address = self.request.META['ip_address']
-    #     if ip_address not in article.rating.all():
-    #         article.rating.add(ip_address)
-    #     return article
-
     def get_queryset(self):
         today = timezone.now().date()
         genre = self.request.GET.get('genre', None)
@@ -84,68 +74,21 @@ class MovieListView(ListView):
             release_date__lte=today
         ).order_by('-release_date')
 
-        # # اضافه کردن فیلم‌های محبوب
-        # context['popular_movies'] = past_movies_with_ratings.annotate(
-        #     num_views=Count('views')
-        # ).order_by('-num_views')[:10]
-        # # اضافه کردن فیلم‌های با بالاترین امتیاز
-        # context['top_rated_movies'] = past_movies_with_ratings.order_by('-average_rating')[:10]
-        # اضافه کردن فیلم‌های پربازدید و برتر به context
         context['popular_movies'] = self.get_queryset().order_by('-num_views')[:10]
         context['top_rated_movies'] = self.get_queryset().order_by('-average_rating')[:10]
 
-        # # اضافه کردن فیلم‌های آینده (اکران بعدی)
-        # current_year = timezone.now().year
-        # start_of_current_year = f"{current_year}-01-01"
-        # context['coming_soon_movies'] = movie_list_with_ratings.filter(
-        #     release_date__gte=start_of_current_year
-        # ).order_by('release_date')[:10]
-        # اضافه کردن فیلم‌هایی که به زودی اکران می‌شوند
         current_year = timezone.now().year
-        start_of_current_year = f"{current_year}-01-01"
+        start_of_current_year = f"{current_year}"
         context['coming_soon_movies'] = self.get_queryset().filter(
-            release_date__gte=start_of_current_year
+            release_date__gt=today
         ).order_by('release_date')[:10]
-
-        # top_rated_movies = Movie.objects.order_by('-rating')[:10]  # استفاده از 'rating' به جای 'average_rating'
-        # top_rated_movies_data = []
-
-        # for movie in top_rated_movies:
-        #     imdb_id = movie.imdb_id
-        #     if imdb_id:
-        #         omdb_data = get_movie_data(imdb_id)
-        #         if omdb_data and 'imdbRating' in omdb_data and omdb_data['imdbRating'] != 'N/A':
-        #             # تبدیل رتبه‌بندی به float و اضافه کردن به لیست به همراه داده‌های فیلم
-        #             rating = float(omdb_data['imdbRating'])
-        #             top_rated_movies_data.append((rating, movie, omdb_data))
-        # # مرتب‌سازی فیلم‌ها بر اساس رتبه‌بندی IMDb به صورت نزولی
-        # top_rated_movies_data.sort(reverse=True, key=lambda x: x[0])
-        # # ایجاد لیست نهایی فیلم‌ها با اطلاعات مرتب‌شده
-        # sorted_movies_with_data = [(movie, data) for rating, movie, data in top_rated_movies_data]
-        # # اضافه کردن به context برای استفاده در template
-        # context['top_rated_movies_data'] = sorted_movies_with_data
         top_rated_movies = self.get_queryset().order_by('-average_rating')[:10]
         top_rated_movies_data = [
             (movie, get_movie_data(movie.imdb_id)) for movie in top_rated_movies if movie.imdb_id
         ]
         context['top_rated_movies_data'] = top_rated_movies_data
 
-        # اضافه کردن اطلاعات URL برای هر فیلم یا سریال
-        # for movie in context['movies']:
-        #     if isinstance(movie, SingleMovie):  # توجه: این فرض بر این است که SingleMovie یک زیرکلاس از Movie است
-        #         movie.url = self.get_movie_url(movie)
-        #     elif isinstance(movie, Series):  # توجه: این فرض بر این است که Series یک زیرکلاس از Movie است
-        #         movie.url = self.get_series_url(movie)
-
         return context
-
-    # def get_movie_url(self, movie):
-    #     # تابعی برای دریافت URL مخصوص فیلم‌های تک قسمتی
-    #     return movie.get_absolute_url()  # فرض بر این است که این متد در مدل Movie یا SingleMovie تعریف شده است
-
-    # def get_series_url(self, series):
-    #     # تابعی برای دریافت URL مخصوص سریال‌ها
-    #     return series.get_absolute_url()  # فرض بر این است که این متد در مدل Series تعریف شده است
 
 # نمایش جزئیات یک فیلم:
 
@@ -166,10 +109,6 @@ class MovieDetailView(DetailView):
         """Override get_object to handle custom logic."""
         obj = super().get_object(queryset=queryset)  # Get the base object
 
-        # اگر فیلم نباید قبل از تاریخ انتشار نمایش داده شود:
-        # if obj.release_date > timezone.now().date():
-        #     raise Http404("This movie is not yet released.")
-        
         return obj
 
 

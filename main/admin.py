@@ -4,15 +4,6 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Genre, Movie, Review  , IpAddress , MovieNote
 
-# @admin.register(Actor)
-# class ActorAdmin(admin.ModelAdmin):
-#     list_display = ('name', )
-#     search_fields = ('name', )
-
-# @admin.register(Director)
-# class DirectorAdmin(admin.ModelAdmin):
-#     list_display = ('full_name', )
-#     search_fields = ('full_name', )
 class ReviewInline(admin.TabularInline):
     model = Review
     extra = 0
@@ -34,7 +25,7 @@ class MovieNoteInline(admin.TabularInline):
 class MovieAdmin(admin.ModelAdmin):
     list_display = ('thumbnail', 'title', 'director_str', 'release_date')
     list_filter = ('genres', 'release_date')
-    search_fields = ('title', 'director__name', 'actor__name')
+    search_fields = ('title', 'director__full_name', 'actor__name')
     inlines = (MovieNoteInline,)  # اضافه کردن نوت‌ها به صورت inline
     fieldsets = (
         (_("اطلاعات اصلی"), {
@@ -52,7 +43,7 @@ class MovieAdmin(admin.ModelAdmin):
     filter_horizontal = ('actor', 'genres')  # اضافه کردن 'director' به 'filter_horizontal'
 
     def director_str(self, obj):
-        return ", ".join([director.name for director in obj.director.all()])
+        return obj.director.full_name
     director_str.short_description = _("کارگردان")
 
     def thumbnail(self, obj):

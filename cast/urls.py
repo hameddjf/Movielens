@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import ActorListView, ActorDetailView, DirectorListView, DirectorDetailView
 
+app_name = 'cast'
 urlpatterns = [
     path('actors/', ActorListView.as_view(), name='actor_list'),
     path('actors/<int:pk>/', ActorDetailView.as_view(), name='actor_detail'),
