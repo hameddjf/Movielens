@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-
+from dotenv import load_dotenv
 import os
 from pathlib import Path
 
@@ -30,8 +30,15 @@ ALLOWED_HOSTS = []
 
 # url = 'http://www.omdbapi.com/?i=tt3896198&apikey=8ce0bd47'
 
-OMDB_API_KEY = os.getenv('OMDB_API_KEY', )  #  api_key از متغیر محیطی استفاده می‌کنیم برای 
+# api_key از متغیر محیطی استفاده می‌کنیم برای
+OMDB_API_KEY = os.getenv('OMDB_API_KEY', )
 OMDB_API_URL = 'http://www.omdbapi.com/'  # URL پایه برای استفاده در درخواست‌ها
+
+
+# این خط کد مقادیر از فایل .env را می‌خواند و به متغیرهای محیطی تبدیل می‌کند
+load_dotenv()
+TMDB_API_KEY = os.getenv('TMDB_API_KEY')
+TMDB_ACCESS_TOKEN = os.getenv('TMDB_ACCESS_TOKEN')
 
 # Application definition
 
@@ -43,14 +50,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'comment',
-    'django_gravatar', 
-    'main',
-    'star_ratings',
+    'django_gravatar',
 
+    'main',
     'cast',
-    'category',
     'episode',
+    'category',
+    'comment',
+    'star_ratings',
 ]
 
 MIDDLEWARE = [
@@ -106,16 +113,21 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME':
+            'django.contrib.auth.\
+                password_validation.UserAttributeSimilarityValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.CommonPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME':
+            'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 
@@ -143,7 +155,7 @@ STATICFILES_DIRS = [
 
     # os.path.join(BASE_DIR, "static/fontawesome"),
 ]
-MEDIA_URL = '/MEDIA/'  # بخواییم برای عکسها و.. مسیر تعیین کنیم و بصورت خودکار نره جایی
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # تعیین مسیر برای فایلهای استاتیک
 
 

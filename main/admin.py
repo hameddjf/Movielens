@@ -2,18 +2,22 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .models import Genre, Movie, Review  , IpAddress , MovieNote
+from .models import Genre, Movie, Review, IpAddress, MovieNote
+
 
 class ReviewInline(admin.TabularInline):
     model = Review
     extra = 0
     fields = ('user', 'content', 'rating', 'approved')
-    raw_id_fields = ('user', )  # اگر تعداد کاربران زیاد است، استفاده از raw_id_fields می‌تواند مفید باشد
+    # اگر تعداد کاربران زیاد است، استفاده از raw_id_fields می‌تواند مفید باشد
+    raw_id_fields = ('user', )
+
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ('name', )
     search_fields = ('name', )
+
 
 class MovieNoteInline(admin.TabularInline):
     model = MovieNote
@@ -21,18 +25,21 @@ class MovieNoteInline(admin.TabularInline):
     fields = ('note', 'created_at', 'updated_at')
     readonly_fields = ('created_at', 'updated_at')
 
+
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
+    list_display_links = ('thumbnail', 'title')
     list_display = ('thumbnail', 'title', 'director_str', 'release_date')
     list_filter = ('genres', 'release_date')
     search_fields = ('title', 'director__full_name', 'actor__name')
     inlines = (MovieNoteInline,)  # اضافه کردن نوت‌ها به صورت inline
     fieldsets = (
         (_("اطلاعات اصلی"), {
-            'fields': ('title', 'slug', 'status', 'category', 'description')
+            'fields': ('title', 'slug', 'status', 'type', 'description')
         }),
         (_("جزئیات"), {
-            'fields': ('release_date', 'director', 'actor', 'genres', 'imdb_id', 'imdb_rating', 'duration', 'poster', 'views')
+            'fields': ('release_date', 'director', 'actor', 'genres',
+                       'imdb_id', 'imdb_rating', 'duration', 'poster', 'views')
         }),
         (_("متا داده‌ها"), {
             'fields': ('created_at', 'updated_at'),
@@ -40,7 +47,8 @@ class MovieAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ('created_at', 'updated_at')
-    filter_horizontal = ('actor', 'genres')  # اضافه کردن 'director' به 'filter_horizontal'
+    # اضافه کردن 'director' به 'filter_horizontal'
+    filter_horizontal = ('actor', 'genres')
 
     def director_str(self, obj):
         return obj.director.full_name
@@ -48,8 +56,17 @@ class MovieAdmin(admin.ModelAdmin):
 
     def thumbnail(self, obj):
         if obj.poster:
-            return format_html('<img src="{}" style="width: 45px; height: auto;" />', obj.poster)
-        return ""
+            if hasattr(obj.poster, 'url'):  # بررسی می‌کند که آیا obj.poster دارای ویژگی url است
+                image_url = obj.poster.url  # تصویر ذخیره شده در سرور
+            elif isinstance(obj.poster, str) and obj.poster.startswith("http"):
+                image_url = obj.poster  # URL مستقیم تصویر
+            else:
+                return ""  # در صورتی که هیچکدام نباشد، خالی برگرداند
+
+            # نمایش تصویر با استفاده از URL تصویر
+            return format_html('<img src="{}" style="width: 45px; height: auto;" />', image_url)
+        return ""  # در صورتی که obj.poster خالی باشد، خالی برگرداند
+
     thumbnail.short_description = _("پوستر")
 
     def get_form(self, request, obj=None, **kwargs):
@@ -58,14 +75,15 @@ class MovieAdmin(admin.ModelAdmin):
         if not is_superuser:
             self.fieldsets = (
                 (_("اطلاعات اصلی"), {
-                    'fields': ('title', 'slug', 'status', 'category', 'description')
+                    'fields': ('title', 'slug', 'status',
+                               'type', 'description')
                 }),
                 (_("جزئیات"), {
-                    'fields': ('release_date', 'genres', 'duration', 'poster', 'views')
+                    'fields': ('release_date', 'genres', 'duration',
+                               'poster', 'views')
                 }),
                 # مخفی کردن بخش متا داده‌ها برای غیر سوپریوزرها
             )
-            # مخفی کردن فیلدهای دیگری که برای غیر سوپریوزرها نباید قابل دسترس باشند
         return form
 
 # @admin.register(Episode)
@@ -74,5 +92,6 @@ class MovieAdmin(admin.ModelAdmin):
 #     list_filter = ('movie',)
 #     search_fields = ('title', 'movie__title')
 #     ordering = ('movie', 'title')
+
 
 admin.site.register(IpAddress)

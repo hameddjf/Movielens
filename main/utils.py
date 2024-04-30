@@ -1,18 +1,28 @@
 import httpx
+import requests
 from datetime import datetime
+from asgiref.sync import sync_to_async
+
 from django.conf import settings
 from django.utils.text import slugify
-from asgiref.sync import sync_to_async
-from .models import Movie, Genre  # مطمئن شوید که Movie, Director, Actor, و Genre را از مکان مناسب import کرده‌اید
-from cast.models import Actor , Director
+
+from .models import Movie, Genre
+
+from cast.models import Actor, Director
 # تابعی برای دریافت اطلاعات فیلم از API OMDb به صورت آسنکرون
+
+
 async def fetch_movie_data(movie_title):
     async with httpx.AsyncClient() as client:
-        response = await client.get(f'http://www.omdbapi.com/?t={movie_title}&apikey={settings.OMDB_API_KEY}')
+        response = await client.get(
+            f'http://www.omdbapi.com/?t={movie_title}\
+                &apikey={settings.OMDB_API_KEY}')
         movie_data = response.json()
         return movie_data
 
 # تابعی برای تبدیل رشته تاریخ به فرمت استاندارد YYYY-MM-DD
+
+
 def format_date(date_string):
     try:
         date_object = datetime.strptime(date_string, '%d %b %Y')
@@ -21,21 +31,26 @@ def format_date(date_string):
         return None
 
 # تابعی برای کوتاه کردن رشته‌ها به طول حداکثر مشخص شده
+
+
 def truncate_string(value, max_length):
     if value and len(value) > max_length:
         return value[:max_length]
     return value
 
 # تابعی برای ذخیره اطلاعات فیلم در پایگاه داده به صورت همزمان
+
+
 @sync_to_async
 def save_movie_to_db(movie_title, movie_data):
     movie_title = truncate_string(movie_title, 300)
     movie_slug = slugify(movie_title)
     release_date_string = movie_data.get('Released', 'N/A')
-    formatted_release_date = format_date(release_date_string) if release_date_string != 'N/A' else None
+    formatted_release_date = format_date(
+        release_date_string) if release_date_string != 'N/A' else None
     director_name = movie_data.get('Director', '').split(',')[0].strip()
     director, _ = Director.objects.get_or_create(full_name=director_name)
-   # تبدیل 'imdbRating' به عدد دسیمال یا None اگر 'N/A' باشد
+    # تبدیل 'imdbRating' به عدد دسیمال یا None اگر 'N/A' باشد
     imdb_rating = movie_data.get('imdbRating')
     if imdb_rating == 'N/A':
         imdb_rating = None
@@ -85,6 +100,8 @@ def save_movie_to_db(movie_title, movie_data):
 
     movie.save()
     return movie
+
+
 def get_movie_type_from_imdb(title):
     url = f"https://api.imdb.com/title/find?q={title}"
     response = requests.get(url)
@@ -99,8 +116,10 @@ def get_movie_type_from_imdb(title):
 
     return None
 # تابع اصلی برای انجام فرآیند ذخیره اطلاعات فیلم
+
+
 async def save_movie_details(movie_title):
-    # movie_type = await get_movie_type_from_imdb(title)
+    # movie_type = await get_movie_type_from_imdb( )
     movie_data = await fetch_movie_data(movie_title)
     if movie_data.get('Response') == 'True':
         movie = await save_movie_to_db(movie_title, movie_data)

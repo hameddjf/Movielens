@@ -1,27 +1,33 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.views import View
 from django.views.generic import ListView, DetailView
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Count, Q , Avg
+from django.db.models import Count, Avg
 from django.conf import settings
+
 import requests
+from datetime import datetime, timedelta
 
-from datetime import datetime , timedelta
+from .models import Movie, Review
+from .utils import save_movie_details
 
-from .models import Movie, Review, Genre
-from .utils import save_movie_details  # اطمینان حاصل کنید که مسیر صحیح است
 from episode.models import Episode
-from cast.models import Actor , Director
+# from cast.models import Actor, Director
+
 
 def save_movie_view(request, movie_title):
     save_movie_details(movie_title)
-    return JsonResponse({'status': 'success', 'message': f"Details for '{movie_title}' have been saved."})
+    return JsonResponse({'status': 'success', 'message':
+                         f"Details for '{movie_title}' have been saved."})
+
 
 def get_movie_data(imdb_id):
     """
-     این تابع با استفاده از IMDb ID یک فیلم، اطلاعات آن فیلم را از OMDB API دریافت می‌کند.
+     این تابع با استفاده از 
+     IMDb ID یک فیلم، اطلاعات آن فیلم را از 
+     OMDB API دریافت می‌کند.
     """
     params = {
         'i': imdb_id,
@@ -32,6 +38,8 @@ def get_movie_data(imdb_id):
     return movie_data
 
 # Create your views here.
+
+
 class MovieListView(ListView):
     last_month = datetime.today() - timedelta(days=30)
     model = Movie
@@ -42,61 +50,70 @@ class MovieListView(ListView):
     def get_queryset(self):
         today = timezone.now().date()
         genre = self.request.GET.get('genre', None)
-        queryset = Movie.objects.annotate(average_rating=Avg('rating__average'), num_views=Count('views'))
+        queryset = Movie.objects.annotate(average_rating=Avg(
+            'rating__average'), num_views=Count('views'))
         if genre:
             queryset = queryset.filter(genres__id=genre)
-        return queryset.filter(release_date__lte=today).order_by('-release_date')
-
-
+        return queryset.filter(
+            release_date__lte=today).order_by('-release_date')
 
     def get_context_data(self, **kwargs):
         context = super(MovieListView, self).get_context_data(**kwargs)
 
-        #دریافت تاریخ امروز
+        # دریافت تاریخ امروز
         today = timezone.now().date()
 
-           # اضافه کردن میانگین امتیاز به تمام فیلم‌ها
+        # اضافه کردن میانگین امتیاز به تمام فیلم‌ها
         movie_list_with_ratings = Movie.objects.annotate(
-                    average_rating=Avg('rating__average')  # فرض بر این است که فیلد rating به AbstractBaseRating ارتباط دارد
-                )
+            average_rating=Avg('rating__average')
+        )
 
         # فیلتر کردن فیلم‌های با تاریخ انتشار در گذشته
-        past_movies_with_ratings = movie_list_with_ratings.filter(release_date__lte=today)
-
-       
-        # اضافه کردن فیلم‌های بر اساس تاریخ انتشار
-        context['created_at'] = past_movies_with_ratings.filter(
-            created_at__date__lte=today
-        ).order_by('-created_at')
-
-
-        context['release_date'] = past_movies_with_ratings.filter(
+        past_movies_with_ratings = movie_list_with_ratings.filter(
             release_date__lte=today
-        ).order_by('-release_date')
+        )
 
-        context['popular_movies'] = self.get_queryset().order_by('-num_views')[:10]
-        context['top_rated_movies'] = self.get_queryset().order_by('-average_rating')[:10]
+        # اضافه کردن فیلم‌های بر اساس تاریخ انتشار
+        context['created_at'] = past_movies_with_ratings.order_by(
+            '-created_at')
+        context['release_date'] = past_movies_with_ratings.order_by(
+            '-release_date')
+        context['popular_movies'] = past_movies_with_ratings.order_by(
+            '-views')[:10]
 
-        current_year = timezone.now().year
-        start_of_current_year = f"{current_year}"
-        context['coming_soon_movies'] = self.get_queryset().filter(
+        # مرتب سازی بر اساس امتیاز کاربران، با محدودیت برای فیلم‌هایی که امتیاز دارند
+        top_rated_movies = past_movies_with_ratings.exclude(
+            average_rating__isnull=True).order_by('-average_rating')[:10]
+        context['top_rated_movies'] = top_rated_movies
+
+        # فیلتر کردن فیلم‌های آینده و مرتب سازی بر اساس تاریخ انتشار
+        context['coming_soon_movies'] = movie_list_with_ratings.filter(
             release_date__gt=today
         ).order_by('release_date')[:10]
-        top_rated_movies = self.get_queryset().order_by('-average_rating')[:10]
+
+        # مرتب سازی بر اساس امتیاز کاربران برای نمایش در صفحه جزئیات
+        top_rated_movies_imdb = past_movies_with_ratings.exclude(
+            imdb_rating__isnull=True).order_by('-imdb_rating')[:10]
         top_rated_movies_data = [
-            (movie, get_movie_data(movie.imdb_id)) for movie in top_rated_movies if movie.imdb_id
-        ]
+            (movie, {'rating': movie.imdb_rating})
+            for movie in top_rated_movies_imdb]
         context['top_rated_movies_data'] = top_rated_movies_data
+
+        imdb_ratings_dict = {movie.id: movie.imdb_rating for movie in past_movies_with_ratings.exclude(
+            imdb_rating__isnull=True)}
+        context['imdb_ratings_dict'] = imdb_ratings_dict
 
         return context
 
 # نمایش جزئیات یک فیلم:
 
-class AverageRatingView(View):
-    def get(self, request):
-        rating = AbstractBaseRating()
-        rating.calculate()
-        return HttpResponse("Average rating calculated.")
+
+# class AverageRatingView(View):
+#     def get(self, request):
+#         rating = AbstractBaseRating()
+#         rating.calculate()
+#         return HttpResponse("Average rating calculated.")
+
 
 class MovieDetailView(DetailView):
     model = Movie
@@ -111,14 +128,13 @@ class MovieDetailView(DetailView):
 
         return obj
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         movie = context['movie']
 
         imdb_id = self.kwargs.get('imdb_id')
         movie_data = get_movie_data(imdb_id)
-        
+
         context['movie_data'] = movie_data
 
         context['reviews'] = Review.objects.get_approved().filter(movie=movie)
@@ -126,6 +142,7 @@ class MovieDetailView(DetailView):
         return context
 
 # نمایش لیست بررسی‌های تایید شده برای یک فیلم
+
 
 class ApprovedReviewListView(ListView):
     model = Review
@@ -140,6 +157,7 @@ class ApprovedReviewListView(ListView):
 
 # اضافه کردن یک بررسی جدید برای فیلم:
 
+
 class AddReviewView(View):
     def post(self, request, *args, **kwargs):
         movie_id = self.kwargs.get('movie_id')
@@ -148,19 +166,22 @@ class AddReviewView(View):
         content = request.POST.get('content')
         rating = request.POST.get('rating')
 
-        Review.objects.create(movie=movie, user=user, content=content, rating=rating)
+        Review.objects.create(movie=movie, user=user,
+                              content=content, rating=rating)
 
-        return HttpResponseRedirect(reverse('movie_detail', kwargs={'slug': movie.slug}))
+        return HttpResponseRedirect(reverse('movie_detail',
+                                            kwargs={'slug': movie.slug}))
 
 
 class EpisodeListView(ListView):
     model = Episode
     template_name = 'episodes/episode_list.html'
     context_object_name = 'episodes'
-    
+
     def get_queryset(self):
         """
-        فیلتر کردن قسمت‌ها بر اساس سریال مربوطه که از طریق slug در URL دریافت شده است.
+        فیلتر کردن قسمت‌ها بر اساس سریال مربوطه که از طریق 
+        slug در URL دریافت شده است.
         """
         movie_slug = self.kwargs.get('movie_slug')
         return Episode.objects.filter(movie__slug=movie_slug)
