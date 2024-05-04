@@ -75,11 +75,11 @@ class MovieListView(ListView):
 
         # اضافه کردن فیلم‌های بر اساس تاریخ انتشار
         context['created_at'] = past_movies_with_ratings.order_by(
-            '-created_at')
+            '-created_at')[:12]
         context['release_date'] = past_movies_with_ratings.order_by(
-            '-release_date')
+            '-release_date')[:12]
         context['popular_movies'] = past_movies_with_ratings.order_by(
-            '-views')[:10]
+            '-views')[:12]
 
         # مرتب سازی بر اساس امتیاز کاربران، با محدودیت برای فیلم‌هایی که امتیاز دارند
         top_rated_movies = past_movies_with_ratings.exclude(
@@ -93,7 +93,7 @@ class MovieListView(ListView):
 
         # مرتب سازی بر اساس امتیاز کاربران برای نمایش در صفحه جزئیات
         top_rated_movies_imdb = past_movies_with_ratings.exclude(
-            imdb_rating__isnull=True).order_by('-imdb_rating')[:10]
+            imdb_rating__isnull=True).order_by('-imdb_rating')[:12]
         top_rated_movies_data = [
             (movie, {'rating': movie.imdb_rating})
             for movie in top_rated_movies_imdb]

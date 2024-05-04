@@ -7115,7 +7115,7 @@ p.ceb-single {
   }
   .slider .slick-multiItemSlider {
     max-width: 300px;
-    padding-top: 60;
+    /* padding-top: 60; */
   }
   .slider .slick-multiItemSlider .movie-item {
     margin-left: 5px;
@@ -7128,7 +7128,7 @@ p.ceb-single {
   margin-top: 30px;
 }
 .slider .slick-multiItemSlider .slick-dots {
-  text-align: right;
+  text-align: center ;
 }
 .sliderv2 {
   background: url('../images/uploads/slider-bg2.jpg') no-repeat;

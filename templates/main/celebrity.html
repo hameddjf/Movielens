@@ -1,0 +1,333 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block main %}
+<style>
+	.celebrity-grid {
+		display: flex;
+		flex-wrap: wrap;
+		margin: -15px; /* این مقدار بسته به نیاز شما تغییر می‌کند */
+	  }
+	  
+	  .celebrity-item {
+		flex: 0 0 33.333%; /* هر آیتم 33.333% از عرض کل را اشغال می‌کند */
+		max-width: 33.333%;
+		padding: 15px; /* این مقدار بسته به نیاز شما تغییر می‌کند */
+		box-sizing: border-box; /* مطمئن شوید که padding و border در عرض محاسبه می‌شوند */
+	  }
+	  
+	  .celebrity-item img {
+		width: 100%;
+		height: auto;
+		display: block;
+	  }
+	  
+	  .celebrity-info {
+		text-align: center; /* مرکز کردن متن در زیر تصویر */
+	  }
+
+	  .pagination-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin: 20px 0;
+	  }
+	  
+	  .pagination-info {
+		order: 2; /* Place the info section on the right side */
+	  }
+	  
+	  .pagination2 {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		list-style: none;
+		order: 1; /* Place the pagination section on the left side */
+	  }
+	  
+	  .pagination2 > a,
+	  .pagination2 > span {
+		padding: 6px 12px;
+		margin: 0 4px;
+		line-height: 1.42857143;
+		color: #0089ff;
+		background-color: #fff;
+		border: 1px solid #ddd;
+		cursor: pointer;
+	  }
+	  
+	  .pagination2 > a:hover {
+		background-color: #eee;
+	  }
+	  
+	  .pagination2 > a.active {
+		color: #fff;
+		background-color: #337ab7;
+		border-color: #337ab7;
+	  }
+	  
+	  .pagination2 > span.disabled {
+		color: #ccc;
+		cursor: not-allowed;
+	  }
+	  
+	  .pagination2 > span.dots {
+		cursor: default;
+		background-color: transparent;
+		border-color: transparent;
+	  }
+	  
+	  .pagination2 > a > i.ion-arrow-left-b,
+	  .pagination2 > a > i.ion-arrow-right-b {
+		font-size: 16px;
+	  }
+	  
+	  @media (max-width: 600px) {
+		.pagination-container {
+		  flex-direction: column;
+		}
+		
+		.pagination-info {
+		  order: 1; /* Info on top on small screens */
+		  margin-bottom: 10px;
+		}
+		
+		.pagination2 {
+		  order: 2;
+		}
+	  }
+
+
+	  .celebrity-info {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin: 5px;
+		padding: 8px;
+		border: 1px solid #ddd;
+		border-radius: 8px;
+		background-color: #f9f9f9;
+		text-align: center;
+	  }
+	  
+	  .celebrity-info h2 {
+		direction: rtl;
+		font-size: 1.5em;
+		padding: 10px;
+		margin: 0;
+		padding-bottom: 10px;
+		{% comment %} font-size: 20px; {% endcomment %}
+		color: #333;
+	  }
+	  .celebrity-info h2 a {
+		font-size: 16px;
+		color: #007bff;
+		text-decoration: none;
+	  }
+	  .celebrity-info h2 a:hover {
+		text-decoration: underline;
+	  }
+	  .celebrity-info .role {
+		font-weight: bold;
+		margin-right: 5px;
+	  }
+	  .celebrity-info span {
+		font-size: 16px;
+		color: #666;
+	  }
+</style>
+	<div class="hero common-hero">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="hero-ct">
+						<h1>celebrity listing - grid</h1>
+						<ul class="breadcumb">
+							<li class="active"><a href="#">Home</a></li>
+							<li> <span class="ion-ios-arrow-right"></span> celebrity listing</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- celebrity grid v1 section-->
+	<div class="page-single">
+		<div class="container">
+			<div class="row ipad-width2">
+				<div class="col-md-9 col-sm-12 col-xs-12">
+					<div class="topbar-filter">
+						<p style='direction:ltr; text-align:left;'>
+							در مجموع  <span> {{ total_celebrities_with_photo }} بازیگر</span> پیدا شد
+						</p>
+						<label>مرتب سازی بر اساس : </label>
+						<form method="GET" action="{% url 'cast:celebrity_list' %}">
+							<select name="filter_by" onchange="this.form.submit()">
+							<option value="name" {% if filter_by == 'name' and order_by == 'asc' %}selected{% endif %}>نام - صعودی</option>
+							<option value="name" {% if filter_by == 'name' and order_by == 'desc' %}selected{% endif %}>نام - نزولی</option>
+							<option value="rating" {% if filter_by == 'rating' and order_by == 'asc' %}selected{% endif %}>امتیاز - صعودی</option>
+							<option value="rating" {% if filter_by == 'rating' and order_by == 'desc' %}selected{% endif %}>امتیاز - نزولی</option>
+							<option value="date" {% if filter_by == 'date' and order_by == 'asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
+							<option value="date" {% if filter_by == 'date' and order_by == 'desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
+							</select>
+						</form>
+						<a href="celebritygrid01.html" class="grid"><i class="ion-grid active"></i></a>
+						</div>
+						<div class="celebrity-grid">
+							{% for celebrity in celebrities %}
+							  <div class="celebrity-item">
+								{% if celebrity.get_role == 'actor' %}
+								  <a href="{% url 'cast:actor_detail' celebrity.pk %}">
+									<img src="{{ celebrity.poster }}" alt="{{ celebrity.name }}">
+								  </a>
+								  <div class="celebrity-info">
+									<h2>
+									  <a href="{% url 'cast:actor_detail' celebrity.pk %}">
+										<span class="role">بازیگر:</span> 
+										{{ celebrity.name }}
+									  </a>
+									</h2>
+								  </div>
+								{% elif celebrity.get_role == 'director' %}
+								  <a href="{% url 'cast:director_detail' celebrity.pk %}">
+									<img src="{{ celebrity.poster }}" alt="{{ celebrity.full_name }}">
+								  </a>
+								  <div class="celebrity-info">
+									<h2>
+									  <a href="{% url 'cast:director_detail' celebrity.pk %}">
+										<span class="role">کارگردان:</span>
+										{{ celebrity.full_name }}
+									  </a>
+									</h2>
+								  </div>
+								{% endif %}
+							  </div>
+							{% endfor %}
+						  </div>
+						  {% if page_obj.paginator.num_pages > 1 %}
+						  <div class="pagination2">
+							<span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} :</span>
+						
+							{% if page_obj.has_previous %}
+							  <a href="?{{ query_params }}&page={{ page_obj.previous_page_number }}"><i class="ion-arrow-left-b"></i></a>
+							{% endif %}
+						
+							{% if page_obj.number > 1 %}
+								<a href="?{{ query_params }}&page=1">1</a>
+								{% if not page_obj.number == 2 and not page_obj.number == 3 and not page_obj.number == 4 %}
+								<span>...</span>
+							  {% endif %}
+							{% endif %}
+						
+							{% if page_obj.number|add:'-2' > 1 %}
+							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'-2' }}">{{ page_obj.number|add:'-2' }}</a>
+							{% endif %}
+							{% if page_obj.number|add:'-1' > 1 %}
+							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'-1' }}">{{ page_obj.number|add:'-1' }}</a>
+							{% endif %}
+						
+							<a class="active" href="?{{ query_params }}&page={{ page_obj.number }}">{{ page_obj.number }}</a>
+						
+							{% if page_obj.number|add:'1' <= page_obj.paginator.num_pages %}
+							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'1' }}">{{ page_obj.number|add:'1' }}</a>
+							{% endif %}
+							{% if page_obj.number|add:'2' <= page_obj.paginator.num_pages %}
+							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'2' }}">{{ page_obj.number|add:'2' }}</a>
+							{% endif %}
+						
+							{% if page_obj.number < page_obj.paginator.num_pages %}
+							{% if page_obj.number < page_obj.paginator.num_pages|add:'-5' %}
+							  <span>...</span>
+							{% endif %}
+							
+							{% if not page_obj.number == page_obj.paginator.num_pages|add:'-2' %}
+							  {% if page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
+								<a href="?{{ query_params }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+							  {% endif %}
+							{% endif %}
+						  {% endif %}
+						
+							{% if page_obj.has_next %}
+							  <a href="?{{ query_params }}&page={{ page_obj.next_page_number }}"><i class="ion-arrow-right-b"></i></a>
+							{% endif %}
+
+
+						  </div>
+						{% endif %}
+
+				</div>
+				<div class="col-md-3 col-xs-12 col-sm-12">
+					<div class="sidebar">
+						<div class="searh-form">
+							<h4 class="sb-title">Search celebrity</h4>
+							<form class="form-style-1 celebrity-form" action="{% url 'cast:search_celebrity' %}" method="get">
+								<div class="col-md-12 form-it">
+									<label>Celebrity Name : </label>
+									<input type="text" name="celebrity_name" placeholder="Enter celebrity name">
+								</div>
+								<div class="col-md-12 form-it">
+									<label>Celebrity Letter : </label>
+									<select name="celebrity_letter">
+										<option value="">All</option>
+										{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
+											<option value="{{ letter }}">{{ letter }}</option>
+										{% endfor %}
+									</select>
+								</div>
+								<div class="col-md-12 form-it">
+									<label>Celebrities : </label>
+									<select name="celebrity_type">
+										<option value="all">همه</option>
+										<option value="actor">بازیگران</option>
+										<option value="director">کارگردانان</option>
+									  </select>
+								</div>
+								<div class="col-md-12 ">
+									<input class="submit" type="submit" value="submit">
+							  	</div>
+								</div>
+							</form>
+							{% comment %} {% for celebrity in celebrities %}
+								<p>{{ celebrity.name }}</p>
+							{% endfor %} {% endcomment %}
+						  </div>
+						{% comment %} <div class="ads">
+							<img src="images/uploads/ads1.png" alt="">
+						</div> {% endcomment %}
+						{% comment %} <div class="celebrities">
+							<h4 class="sb-title">featured celebrity</h4>
+							<div class="celeb-item">
+								<a href="#"><img src="images/uploads/ava1.jpg" alt=""></a>
+								<div class="celeb-author">
+									<h6><a href="#">Samuel N. Jack</a></h6>
+									<span>Actor</span>
+								</div>
+							</div>
+							<div class="celeb-item">
+								<a href="#"><img src="images/uploads/ava2.jpg" alt=""></a>
+								<div class="celeb-author">
+									<h6><a href="#">Benjamin Carroll</a></h6>
+									<span>Actor</span>
+								</div>
+							</div>
+							<div class="celeb-item">
+								<a href="#"><img src="images/uploads/ava3.jpg" alt=""></a>
+								<div class="celeb-author">
+									<h6><a href="#">Beverly Griffin</a></h6>
+									<span>Actor</span>
+								</div>
+							</div>
+							<div class="celeb-item">
+								<a href="#"><img src="images/uploads/ava4.jpg" alt=""></a>
+								<div class="celeb-author">
+									<h6><a href="#">Justin Weaver</a></h6>
+									<span>Actor</span>
+								</div>
+							</div> 
+						</div>{% endcomment %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock main %}

@@ -15,6 +15,9 @@ class Actor(models.Model):
     movies = models.ManyToManyField(Movie, related_name='actors', blank=True,
                                     verbose_name=_('فیلم‌های کارگردان'))
 
+    def get_role(self):
+        return 'actor'
+
     class Meta:
         verbose_name = _("بازیگر")
         verbose_name_plural = _("بازیگران")
@@ -32,6 +35,9 @@ class Director(models.Model):
     movies = models.ManyToManyField(Movie, related_name='directors',
                                     blank=True,
                                     verbose_name=_('فیلم‌های کارگردان'))
+
+    def get_role(self):
+        return 'director'
 
     class Meta:
         verbose_name = _("کارگردان")

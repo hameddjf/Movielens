@@ -3,36 +3,7 @@
 {% block main %}
 
 <script>
-	document.addEventListener('DOMContentLoaded', function () {
-		var carousel = document.getElementById('carousel');
-		var prevButton = document.getElementById('prevButton');
-		var nextButton = document.getElementById('nextButton');
 
-		var scrollPerClick = 300; // میزان اسکرول در هر کلیک
-
-		// نمایش یا مخفی کردن دکمه‌ها بر اساس موقعیت اسکرول
-		var checkButtons = function () {
-			prevButton.style.display = carousel.scrollLeft > 0 ? 'block' : 'none';
-			nextButton.style.display = carousel.scrollLeft < carousel.scrollWidth - carousel.clientWidth ? 'block' : 'none';
-		};
-
-		// اسکرول به سمت چپ
-		prevButton.addEventListener('click', function () {
-			carousel.scrollBy({ left: -scrollPerClick, behavior: 'smooth' });
-			// به‌روزرسانی موقعیت اسکرول بعد از انیمیشن
-			setTimeout(checkButtons, 200);
-		});
-
-		// اسکرول به سمت راست
-		nextButton.addEventListener('click', function () {
-			carousel.scrollBy({ left: scrollPerClick, behavior: 'smooth' });
-			// به‌روزرسانی موقعیت اسکرول بعد از انیمیشن
-			setTimeout(checkButtons, 200);
-		});
-
-		// اولین بررسی دکمه‌ها
-		checkButtons();
-	});
 </script>
 <div class="slider movie-items">
 	<div class="container">
@@ -80,6 +51,8 @@
 				</div>
 				<div class="tabs">
 					<style>
+
+
 						.tab-links {
 							list-style-type: none;
 							margin: 0;
@@ -89,25 +62,16 @@
 							/* Dark background color */
 						}
 
-						.tab-links li {
-							float: left;
-							/* Align tabs to the left side */
-						}
 
 						.tab-links li a {
 							display: block;
 							color: white;
-							/* White text color */
 							text-align: center;
 							padding: 14px 16px;
-							/* Padding inside each tab */
 							text-decoration: none;
 							font-family: 'Tahoma', sans-serif;
-							/* Font family */
 							font-size: 16px !important;
-							/* Font size */
 							transition: 0.3s;
-							/* Transition effect for hover */
 						}
 
 						.tab-links li a:hover {
@@ -123,6 +87,28 @@
 							color: white;
 							/* White text color for the active tab */
 						}
+
+						.movie-items .movie-item .title-in {
+							margin-left: 10px;
+							margin-bottom: 10px;
+						}
+
+						.movie-items .movie-item .mv-img {
+							position: relative;
+							margin-top: 10%;
+
+						}
+						.movie-item:hover .hvr-inner {
+							background-color: transparent;
+						  }
+
+						  .crasol-rat {
+							background-color: #504848ad; 
+							padding: 5px;
+							border-radius: 5px;
+							display: inline-block;
+						  }
+						  
 					</style>
 					<ul class="tab-links">
 						<li class="active"><a href="#tab1">به تازگی</a></li>
@@ -133,40 +119,33 @@
 						<li><a href="#tab6"> imdb</a></li>
 					</ul>
 					<div class="tab-content">
-						<style>
-							.movie-items .movie-item .mv-img {
-								position: relative;
-								margin-top: 10%;
-							}
-						</style>
 						<div id="tab1" class="tab active">
 							<div class="row">
 								<div class="slick-multiItem">
 									{% for related_movie in created_at %}
 										<div class="movie-item">
-											<div class="mv-img">
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-											</div>
+											</a>
 											<div class="hvr-inner">
 												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-													بیشتر <i class="ion-android-arrow-dropright"></i>
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
 												</a>
 											</div>
 											<div class="title-in">
-												<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-													{{ related_movie.title }}
-												</a></h6>
 												{% if related_movie.average_rating %}
 												<p class='crasol-rat'><i class="ion-android-star"></i><span>
-													{{ related_movie.average_rating|floatformat:1 }}</span> /5
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
 												</p>
 												{% elif related_movie.imdb_rating %}
-												<p class='crasol-rat'><i class="ion-android-star"></i><span>
-													{{ related_movie.imdb_rating }}</span> /10
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
 												</p>
 												{% else %}
 												<p class='crasol-rat'><i class="ion-android-star"></i><span>
-													N/A</span> /10
+												  N/A</span>
 												</p>
 												{% endif %}
 											</div>
@@ -181,30 +160,29 @@
 								<div class="slick-multiItem">
 									{% for related_movie in release_date %}
 										<div class="movie-item">
-											<div class="mv-img">
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-											</div>
+											</a>
 											<div class="hvr-inner">
 												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-													بیشتر <i class="ion-android-arrow-dropright"></i>
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
 												</a>
 											</div>
 											<div class="title-in">
-												<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-													{{ related_movie.title }}
-												</a></h6>
 												{% if related_movie.average_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related_movie.average_rating|floatformat:1 }}</span> /5
-													</p>
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
+												</p>
 												{% elif related_movie.imdb_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related_movie.imdb_rating }}</span> /10
-													</p>
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
+												</p>
 												{% else %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														N/A</span> /10
-													</p>
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  N/A</span>
+												</p>
 												{% endif %}
 											</div>
 										</div>
@@ -217,32 +195,29 @@
 								<div class="slick-multiItem">
 									{% for related_movie in popular_movies %}
 										<div class="movie-item">
-											<div class="mv-img">
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
 												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-											</div>
+											</a>
 											<div class="hvr-inner">
 												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-													بیشتر <i class="ion-android-arrow-dropright"></i>
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
 												</a>
 											</div>
 											<div class="title-in">
-												<h6 class='carousel-title'>
-													<a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-														{{ related_movie.title }}
-													</a>
-												</h6>
 												{% if related_movie.average_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related_movie.average_rating|floatformat:1 }}</span> /5
-													</p>
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
+												</p>
 												{% elif related_movie.imdb_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related_movie.imdb_rating }}</span> /10
-													</p>
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
+												</p>
 												{% else %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														N/A</span> /10
-													</p>
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  N/A</span>
+												</p>
 												{% endif %}
 											</div>
 										</div>
@@ -253,32 +228,31 @@
 						<div id="tab4" class="tab">
 							<div class="row">
 								<div class="slick-multiItem">
-									{% for related in top_rated_movies %}
+									{% for related_movie in top_rated_movies %}
 										<div class="movie-item">
-											<div class="mv-img">
-												<img src="{{ related.poster }}" alt="{{ related.title }}" width="200" height="350">
-											</div>
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
+											</a>
 											<div class="hvr-inner">
-												<a href="{% url 'base:movie-detail' slug=related.slug %}"> بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
+												</a>
 											</div>
 											<div class="title-in">
-												<h6 class='carousel-title'>
-													<a class='carousel-title' href="{% url 'base:movie-detail' slug=related.slug %}">
-														{{ related.title }}
-													</a>
-												</h6>
-												{% if related.average_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related.average_rating|floatformat:1 }}</span> /5
-													</p>
-												{% elif related.imdb_rating %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related.imdb_rating }}</span> /10
-													</p>
+												{% if related_movie.average_rating %}
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
+												</p>
+												{% elif related_movie.imdb_rating %}
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
+												</p>
 												{% else %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														N/A
-													</span> /10
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  N/A</span>
+												</p>
 												{% endif %}
 											</div>
 										</div>
@@ -292,29 +266,29 @@
 								<div class="slick-multiItem">
 									{% for related in coming_soon_movies %}
 										<div class="movie-item">
-											<div class="mv-img">
-												<img src="{{ related.poster }}" alt="{{ related.title }}" width="200" height="350">
-											</div>
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
+											</a>
 											<div class="hvr-inner">
-												<a href="{% url 'base:movie-detail' slug=related.slug %}"> بیشتر <i
-														class="ion-android-arrow-dropright"></i> </a>
+												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
+												</a>
 											</div>
 											<div class="title-in">
-												<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related.slug %}">
-													{{ related.title }}</a>
-												</h6>
-												{% if related.average_rating is not None %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related.average_rating|floatformat:1 }}</span> /5
-													</p>
-												{% elif related.imdb_rating is not None %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														{{ related.imdb_rating }}</span> /10
-													</p>
+												{% if related_movie.average_rating %}
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
+												</p>
+												{% elif related_movie.imdb_rating %}
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
+												</p>
 												{% else %}
-													<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														N/A
-													</span> /10
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  N/A</span>
+												</p>
 												{% endif %}
 											</div>
 										</div>
@@ -325,22 +299,32 @@
 						<div id="tab6" class="tab">
 							<div class="row">
 							  	<div class="slick-multiItem">
-									{% for movie, movie_data in top_rated_movies_data %}
+									{% for related_movie, movie_data in top_rated_movies_data %}
 										<div class="movie-item">
-											<div class="mv-img">
-											<!-- استفاده از پوستر فیلم -->
-											<img src="{{ movie.poster }}" alt="{{ movie.title }}" width="200" height="350">
-											</div>
+											<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+												<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
+											</a>
 											<div class="hvr-inner">
-											<!-- لینک به صفحه جزئیات فیلم -->
-											<a href="{% url 'base:movie-detail' slug=movie.slug %}"> بیشتر <i class="ion-android-arrow-dropright"></i> </a>
+												<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+													<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
+														{{ related_movie.title }}
+													</a></h6><i class="ion-android-arrow-dropright"></i>
+												</a>
 											</div>
 											<div class="title-in">
-											<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=movie.slug %}">
-												{{ movie.title }}</a></h6>
-											<!-- نمایش رتبه IMDB -->
-											<p class='crasol-rat'><i class="ion-android-star"></i><span>
-												{{ movie_data.rating }}</span> /10</p>
+												{% if related_movie.average_rating %}
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  {{ related_movie.average_rating|floatformat:1 }}</span> /5
+												</p>
+												{% elif related_movie.imdb_rating %}
+												<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
+												  {{ related_movie.imdb_rating }}</span>
+												</p>
+												{% else %}
+												<p class='crasol-rat'><i class="ion-android-star"></i><span>
+												  N/A</span>
+												</p>
+												{% endif %}
 											</div>
 										</div>
 									{% endfor %}
