@@ -29,13 +29,14 @@ class MovieNoteInline(admin.TabularInline):
 @admin.register(Movie)
 class MovieAdmin(admin.ModelAdmin):
     list_display_links = ('thumbnail', 'title')
-    list_display = ('thumbnail', 'title', 'director_str', 'release_date')
+    list_display = ('thumbnail', 'title', 'category',
+                    'director_str', 'release_date')
     list_filter = ('genres', 'release_date')
     search_fields = ('title', 'director__full_name', 'actor__name')
     inlines = (MovieNoteInline,)  # اضافه کردن نوت‌ها به صورت inline
     fieldsets = (
         (_("اطلاعات اصلی"), {
-            'fields': ('title', 'slug', 'status', 'type', 'description')
+            'fields': ('title', 'slug', 'status', 'category', 'description')
         }),
         (_("جزئیات"), {
             'fields': ('release_date', 'director', 'actor', 'genres',
@@ -76,7 +77,7 @@ class MovieAdmin(admin.ModelAdmin):
             self.fieldsets = (
                 (_("اطلاعات اصلی"), {
                     'fields': ('title', 'slug', 'status',
-                               'type', 'description')
+                               'category', 'description')
                 }),
                 (_("جزئیات"), {
                     'fields': ('release_date', 'genres', 'duration',

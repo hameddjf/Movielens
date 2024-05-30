@@ -46,7 +46,7 @@ class Movie(PolymorphicModel):
     slug = models.SlugField(max_length=500, unique=True,
                             verbose_name="آدرس فیلم", blank=True, null=True)
     status = models.BooleanField(_('تاییدیه انتشار'), default=False)
-    type = models.ForeignKey('category.Category', verbose_name=_(
+    category = models.ForeignKey('category.Category', verbose_name=_(
         "دسته بندی"), blank=True, null=True, on_delete=models.CASCADE)
     release_date = models.DateField(
         _("تاریخ اکران فیلم"), null=True, blank=True)

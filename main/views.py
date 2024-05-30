@@ -4,7 +4,7 @@ from django.views import View
 from django.views.generic import ListView, DetailView
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Q
 from django.conf import settings
 
 import requests
@@ -14,6 +14,7 @@ from .models import Movie, Review
 from .utils import save_movie_details
 
 from episode.models import Episode
+from category.models import Category
 # from cast.models import Actor, Director
 
 
@@ -25,8 +26,8 @@ def save_movie_view(request, movie_title):
 
 def get_movie_data(imdb_id):
     """
-     این تابع با استفاده از 
-     IMDb ID یک فیلم، اطلاعات آن فیلم را از 
+     این تابع با استفاده از
+     IMDb ID یک فیلم، اطلاعات آن فیلم را از
      OMDB API دریافت می‌کند.
     """
     params = {
@@ -57,53 +58,90 @@ class MovieListView(ListView):
         return queryset.filter(
             release_date__lte=today).order_by('-release_date')
 
-    def get_context_data(self, **kwargs):
-        context = super(MovieListView, self).get_context_data(**kwargs)
-
-        # دریافت تاریخ امروز
+    def get_context_data(self, *kwargs):
+        context = super().get_context_data(*kwargs)
         today = timezone.now().date()
-
-        # اضافه کردن میانگین امتیاز به تمام فیلم‌ها
         movie_list_with_ratings = Movie.objects.annotate(
-            average_rating=Avg('rating__average')
+            average_rating=Avg('imdb_rating')
         )
-
-        # فیلتر کردن فیلم‌های با تاریخ انتشار در گذشته
         past_movies_with_ratings = movie_list_with_ratings.filter(
             release_date__lte=today
         )
+        categories = Category.objects.all()
+        context['categories'] = categories
 
-        # اضافه کردن فیلم‌های بر اساس تاریخ انتشار
-        context['created_at'] = past_movies_with_ratings.order_by(
-            '-created_at')[:12]
-        context['release_date'] = past_movies_with_ratings.order_by(
-            '-release_date')[:12]
-        context['popular_movies'] = past_movies_with_ratings.order_by(
-            '-views')[:12]
+        context['categorized_movies'] = []
 
-        # مرتب سازی بر اساس امتیاز کاربران، با محدودیت برای فیلم‌هایی که امتیاز دارند
-        top_rated_movies = past_movies_with_ratings.exclude(
-            average_rating__isnull=True).order_by('-average_rating')[:10]
-        context['top_rated_movies'] = top_rated_movies
+        seen_movies = set()
 
-        # فیلتر کردن فیلم‌های آینده و مرتب سازی بر اساس تاریخ انتشار
-        context['coming_soon_movies'] = movie_list_with_ratings.filter(
-            release_date__gt=today
-        ).order_by('release_date')[:10]
+        for category in categories:
+            movies = {
+                'created_at': {'name': 'اخیرا', 'data': Movie.objects.filter(category=category).filter(release_date__lte=today).order_by('-created_at').distinct()[:12]},
+                'release_date': {'name': 'جدیدترین', 'data': Movie.objects.filter(category=category).filter(release_date__lte=today).order_by('-release_date').distinct()[:12]},
+                'popular_movies': {'name': 'محبوب', 'data': Movie.objects.filter(category=category).filter(release_date__lte=today).order_by('-views').distinct()[:12]},
+                'coming_soon_movies': {'name': 'بزودی', 'data': Movie.objects.filter(category=category).filter(release_date__gt=today).order_by('release_date').distinct()[:10]},
+                'top_rated': {'name': 'بیشترین امتیاز', 'data': past_movies_with_ratings.filter(category=category).exclude(average_rating__isnull=True).order_by('-average_rating').distinct()[:10]},
+                'top_rated_imdb': {'name': 'IMDb', 'data': past_movies_with_ratings.filter(category=category).exclude(imdb_rating__isnull=True).order_by('-imdb_rating').distinct()[:12]}
+            }
 
-        # مرتب سازی بر اساس امتیاز کاربران برای نمایش در صفحه جزئیات
-        top_rated_movies_imdb = past_movies_with_ratings.exclude(
-            imdb_rating__isnull=True).order_by('-imdb_rating')[:12]
-        top_rated_movies_data = [
-            (movie, {'rating': movie.imdb_rating})
-            for movie in top_rated_movies_imdb]
-        context['top_rated_movies_data'] = top_rated_movies_data
-
-        imdb_ratings_dict = {movie.id: movie.imdb_rating for movie in past_movies_with_ratings.exclude(
-            imdb_rating__isnull=True)}
-        context['imdb_ratings_dict'] = imdb_ratings_dict
+            context['categorized_movies'].append(
+                {'category': category, 'movies': movies})
 
         return context
+
+    # def get_context_data(self, **kwargs):
+    #     context = super(MovieListView, self).get_context_data(**kwargs)
+
+    #     # دریافت تاریخ امروز
+    #     today = timezone.now().date()
+
+    #     # استخراج دسته‌بندی‌ها
+    #     categories = Category.objects.all()
+    #     context['categories'] = categories
+
+    #     # اضافه کردن میانگین امتیاز به تمام فیلم‌ها
+    #     movie_list_with_ratings = Movie.objects.annotate(
+    #         average_rating=Avg('rating__average')
+    #     )
+
+    #     # فیلتر کردن فیلم‌های با تاریخ انتشار در گذشته
+    #     past_movies_with_ratings = movie_list_with_ratings.filter(
+    #         release_date__lte=today
+    #     )
+
+    #     # اضافه کردن فیلم‌های بر اساس تاریخ انتشار
+    #     context['created_at'] = past_movies_with_ratings.order_by(
+    #         '-created_at')[:12]
+
+    #     context['release_date'] = past_movies_with_ratings.order_by(
+    #         '-release_date')[:12]
+
+    #     context['popular_movies'] = past_movies_with_ratings.order_by(
+    #         '-views')[:12]
+
+    #     # مرتب سازی بر اساس امتیاز کاربران، با محدودیت برای فیلم‌هایی که امتیاز دارند
+    #     top_rated_movies = past_movies_with_ratings.exclude(
+    #         average_rating__isnull=True).order_by('-average_rating')[:10]
+    #     context['top_rated_movies'] = top_rated_movies
+
+    #     # فیلتر کردن فیلم‌های آینده و مرتب سازی بر اساس تاریخ انتشار
+    #     context['coming_soon_movies'] = movie_list_with_ratings.filter(
+    #         release_date__gt=today
+    #     ).order_by('release_date')[:10]
+
+    #     # مرتب سازی بر اساس امتیاز کاربران برای نمایش در صفحه جزئیات
+    #     top_rated_movies_imdb = past_movies_with_ratings.exclude(
+    #         imdb_rating__isnull=True).order_by('-imdb_rating')[:12]
+    #     top_rated_movies_data = [
+    #         (movie, {'rating': movie.imdb_rating})
+    #         for movie in top_rated_movies_imdb]
+    #     context['top_rated_movies_data'] = top_rated_movies_data
+
+    #     imdb_ratings_dict = {movie.id: movie.imdb_rating for movie in past_movies_with_ratings.exclude(
+    #         imdb_rating__isnull=True)}
+    #     context['imdb_ratings_dict'] = imdb_ratings_dict
+
+    #     return context
 
 # نمایش جزئیات یک فیلم:
 
@@ -180,7 +218,7 @@ class EpisodeListView(ListView):
 
     def get_queryset(self):
         """
-        فیلتر کردن قسمت‌ها بر اساس سریال مربوطه که از طریق 
+        فیلتر کردن قسمت‌ها بر اساس سریال مربوطه که از طریق
         slug در URL دریافت شده است.
         """
         movie_slug = self.kwargs.get('movie_slug')
