@@ -4341,7 +4341,7 @@ ul {
 .movie-item-style-1 .hvr-inner {
   position: absolute;
   top: 0;
-  background-color: #dd003f;
+  /* background-color: #dd003f; */
   padding: 8px 15px;
   text-align: center;
   margin-left: 30px;

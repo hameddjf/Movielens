@@ -3,6 +3,5 @@ from .views import category_list
 
 app_name = 'category'
 urlpatterns = [
-    path('categories/', category_list, name='category_list'),
-
+    path('<slug:slug>/', category_list, name='category_list'),
 ]

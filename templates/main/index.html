@@ -48,15 +48,21 @@
 
 </script>
 	<div class="container">
-		{% for category in categories %}
+		{% for category_data in categorized_movies %}
 			<div class="row ipad-width">
 				<div class="col-md-12">
 					<div class="title-hd">
-						<h2>{{ category.title }}</h2>
-						<a href="#" class="viewall">View all <i class="ion-ios-arrow-right"></i></a>
+						<h2>{{ category_data.category.title }}</h2>
+						<a href="{% url 'category:category_list' slug=category_data.category.slug %}" class="viewall">مشاهده بیشتر <i class="ion-ios-arrow-right"></i></a>
+
 					</div>
 					<div class="tabs">
 						<style>
+							.tabs .tab {
+								display: none;
+								padding: initial;
+								padding-top: 10px;
+							}
 							.tab-links {
 								list-style-type: none;
 								margin: 0;
@@ -121,18 +127,18 @@
 							<li><a href="#{{ category.id }}-tab5">بزودی</a></li>
 							<li><a href="#{{ category.id }}-tab6">IMDB</a></li>
 						  </ul> {% endcomment %}
-						<ul class="tab-links">
-							{% for key, value in categorized_movies.0.movies.items %}
-								<li>
-									<a href="#{{ category.id }}-{{ key }}">{{ value.name }}</a>
+						  <ul class="tab-links">
+							{% for key, value in category_data.movies.items %}
+								<li class="{% if forloop.first %}active{% endif %}">
+									<a href="#{{ category_data.category.id }}-{{ key }}">{{ value.name }}</a>
 								</li>
 							{% endfor %}
 						</ul>
 						
 						
 						<div class="tab-content">
-							{% for key, value in categorized_movies.0.movies.items %}
-                    			<div id="{{ category.id }}-{{ key }}" class="tab {% if forloop.first %}active{% endif %}">
+							{% for key, value in category_data.movies.items %}
+        						<div id="{{ category_data.category.id }}-{{ key }}" class="tab {% if forloop.first %}active{% endif %}">
 									<div class="row">
 										<div class="slick-multiItem">
 											{% for related_movie in value.data %}
@@ -149,18 +155,18 @@
 														</a>
 													</div>
 													<div class="title-in">
-														{% if related_movie.average_rating %}
+														{% comment %} {% if related_movie.average_rating %}
 														<p class='crasol-rat'><i class="ion-android-star"></i><span>
 														{{ related_movie.average_rating|floatformat:1 }}</span> /5
-														</p>
-														{% elif related_movie.imdb_rating %}
-														<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-														{{ related_movie.imdb_rating }}</span>
-														</p>
+														</p> {% endcomment %}
+														{% if related_movie.imdb_rating %}
+															<p class='crasol-rat'><i class="fab fa-imdb"></i>
+																<span>{{ related_movie.imdb_rating }}</span>
+															</p>
 														{% else %}
-														<p class='crasol-rat'><i class="ion-android-star"></i><span>
-														N/A</span>
-														</p>
+															<p class='crasol-rat'><i class="ion-android-star"></i>
+																<span>N/A</span>
+															</p>
 														{% endif %}
 													</div>
 												</div>
@@ -177,182 +183,3 @@
 	</div>
 </div>
 {% endblock main %}
-
-
-
-									{% comment %} <div id="#tab{{ category.title | lower }}" class="tab {% if forloop.first %}active{% endif %}">
-										<div class="row">
-											<div class="slick-multiItem">
-												{% for related_movie in release_date %}
-													<div class="movie-item">
-														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-															<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-														</a>
-														<div class="hvr-inner">
-															<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																	{{ related_movie.title }}
-																</a></h6><i class="ion-android-arrow-dropright"></i>
-															</a>
-														</div>
-														<div class="title-in">
-															{% if related_movie.average_rating %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															{{ related_movie.average_rating|floatformat:1 }}</span> /5
-															</p>
-															{% elif related_movie.imdb_rating %}
-															<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-															{{ related_movie.imdb_rating }}</span>
-															</p>
-															{% else %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															N/A</span>
-															</p>
-															{% endif %}
-														</div>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									</div>
-									<div id="#tab{{ category.title | lower }}" class="tab {% if forloop.first %}active{% endif %}">
-										<div class="row">
-											<div class="slick-multiItem">
-												{% for related_movie in popular_movies %}
-													<div class="movie-item">
-														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-															<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-														</a>
-														<div class="hvr-inner">
-															<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																	{{ related_movie.title }}
-																</a></h6><i class="ion-android-arrow-dropright"></i>
-															</a>
-														</div>
-														<div class="title-in">
-															{% if related_movie.average_rating %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															{{ related_movie.average_rating|floatformat:1 }}</span> /5
-															</p>
-															{% elif related_movie.imdb_rating %}
-															<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-															{{ related_movie.imdb_rating }}</span>
-															</p>
-															{% else %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															N/A</span>
-															</p>
-															{% endif %}
-														</div>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									</div>
-									<div id="#tab{{ category.title | lower }}" class="tab {% if forloop.first %}active{% endif %}">
-										<div class="row">
-											<div class="slick-multiItem">
-												{% for related_movie in top_rated_movies %}
-													<div class="movie-item">
-														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-															<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-														</a>
-														<div class="hvr-inner">
-															<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																	{{ related_movie.title }}
-																</a></h6><i class="ion-android-arrow-dropright"></i>
-															</a>
-														</div>
-														<div class="title-in">
-															{% if related_movie.average_rating %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															{{ related_movie.average_rating|floatformat:1 }}</span> /5
-															</p>
-															{% elif related_movie.imdb_rating %}
-															<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-															{{ related_movie.imdb_rating }}</span>
-															</p>
-															{% else %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															N/A</span>
-															</p>
-															{% endif %}
-														</div>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									</div>
-
-									<div id="#tab{{ category.title | lower }}" class="tab {% if forloop.first %}active{% endif %}">
-										<div class="row">
-											<div class="slick-multiItem">
-												{% for related in coming_soon_movies %}
-													<div class="movie-item">
-														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-															<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-														</a>
-														<div class="hvr-inner">
-															<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																	{{ related_movie.title }}
-																</a></h6><i class="ion-android-arrow-dropright"></i>
-															</a>
-														</div>
-														<div class="title-in">
-															{% if related_movie.average_rating %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															{{ related_movie.average_rating|floatformat:1 }}</span> /5
-															</p>
-															{% elif related_movie.imdb_rating %}
-															<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-															{{ related_movie.imdb_rating }}</span>
-															</p>
-															{% else %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															N/A</span>
-															</p>
-															{% endif %}
-														</div>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									</div>
-									<div id="#tab{{ category.title | lower }}" class="tab {% if forloop.first %}active{% endif %}">
-										<div class="row">
-											<div class="slick-multiItem">
-												{% for related_movie, movie_data in top_rated_movies_data %}
-													<div class="movie-item">
-														<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-															<img src="{{ related_movie.poster }}" alt="{{ related_movie.title }}" width="200" height="350">
-														</a>
-														<div class="hvr-inner">
-															<a href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																<h6 class='carousel-title'><a class='carousel-title' href="{% url 'base:movie-detail' slug=related_movie.slug %}">
-																	{{ related_movie.title }}
-																</a></h6><i class="ion-android-arrow-dropright"></i>
-															</a>
-														</div>
-														<div class="title-in">
-															{% if related_movie.average_rating %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															{{ related_movie.average_rating|floatformat:1 }}</span> /5
-															</p>
-															{% elif related_movie.imdb_rating %}
-															<p class='crasol-rat'><i class="fab fa-imdb"></i><span>
-															{{ related_movie.imdb_rating }}</span>
-															</p>
-															{% else %}
-															<p class='crasol-rat'><i class="ion-android-star"></i><span>
-															N/A</span>
-															</p>
-															{% endif %}
-														</div>
-													</div>
-												{% endfor %}
-											</div>
-										</div>
-									</div> {% endcomment %}

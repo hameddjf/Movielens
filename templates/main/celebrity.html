@@ -1,18 +1,33 @@
 {% extends "main/base.html" %}
 {% load static %}
 {% block main %}
+<script>
+	window.onload = function() {
+		var select = document.querySelector('select[name="filter_by"]');
+	  
+		select.addEventListener('change', function() {
+			localStorage.setItem('selected_option', this.value);
+		});
+	  
+		var selectedOption = localStorage.getItem('selected_option');
+	  
+		if (selectedOption) {
+			select.value = selectedOption;
+		}
+	};
+</script>
 <style>
 	.celebrity-grid {
 		display: flex;
 		flex-wrap: wrap;
-		margin: -15px; /* این مقدار بسته به نیاز شما تغییر می‌کند */
+		margin: -15px; 
 	  }
 	  
 	  .celebrity-item {
-		flex: 0 0 33.333%; /* هر آیتم 33.333% از عرض کل را اشغال می‌کند */
+		flex: 0 0 33.333%; 
 		max-width: 33.333%;
-		padding: 15px; /* این مقدار بسته به نیاز شما تغییر می‌کند */
-		box-sizing: border-box; /* مطمئن شوید که padding و border در عرض محاسبه می‌شوند */
+		padding: 15px; 
+		box-sizing: border-box;
 	  }
 	  
 	  .celebrity-item img {
@@ -22,7 +37,7 @@
 	  }
 	  
 	  .celebrity-info {
-		text-align: center; /* مرکز کردن متن در زیر تصویر */
+		text-align: center; 
 	  }
 
 	  .pagination-container {
@@ -33,7 +48,7 @@
 	  }
 	  
 	  .pagination-info {
-		order: 2; /* Place the info section on the right side */
+		order: 2; 
 	  }
 	  
 	  .pagination2 {
@@ -41,7 +56,7 @@
 		justify-content: center;
 		align-items: center;
 		list-style: none;
-		order: 1; /* Place the pagination section on the left side */
+		order: 1; 
 	  }
 	  
 	  .pagination2 > a,
@@ -116,7 +131,6 @@
 		padding: 10px;
 		margin: 0;
 		padding-bottom: 10px;
-		{% comment %} font-size: 20px; {% endcomment %}
 		color: #333;
 	  }
 	  .celebrity-info h2 a {
@@ -163,12 +177,12 @@
 						<label>مرتب سازی بر اساس : </label>
 						<form method="GET" action="{% url 'cast:celebrity_list' %}">
 							<select name="filter_by" onchange="this.form.submit()">
-							<option value="name" {% if filter_by == 'name' and order_by == 'asc' %}selected{% endif %}>نام - صعودی</option>
-							<option value="name" {% if filter_by == 'name' and order_by == 'desc' %}selected{% endif %}>نام - نزولی</option>
-							<option value="rating" {% if filter_by == 'rating' and order_by == 'asc' %}selected{% endif %}>امتیاز - صعودی</option>
-							<option value="rating" {% if filter_by == 'rating' and order_by == 'desc' %}selected{% endif %}>امتیاز - نزولی</option>
-							<option value="date" {% if filter_by == 'date' and order_by == 'asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
-							<option value="date" {% if filter_by == 'date' and order_by == 'desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
+								<option value="name" {% if filter_order == 'name_asc' %}selected{% endif %}>نام - صعودی</option>
+								<option value="name" {% if filter_order == 'name_desc' %}selected{% endif %}>نام - نزولی</option>
+								<option value="rating" {% if filter_order == 'rating_asc' %}selected{% endif %}>امتیاز - صعودی</option>
+								<option value="rating" {% if filter_order == 'rating_desc' %}selected{% endif %}>امتیاز - نزولی</option>
+								<option value="date" {% if filter_order == 'date_asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
+								<option value="date" {% if filter_order == 'date_desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
 							</select>
 						</form>
 						<a href="celebritygrid01.html" class="grid"><i class="ion-grid active"></i></a>
@@ -203,79 +217,78 @@
 								{% endif %}
 							  </div>
 							{% endfor %}
-						  </div>
-						  {% if page_obj.paginator.num_pages > 1 %}
-						  <div class="pagination2">
-							<span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} :</span>
-						
-							{% if page_obj.has_previous %}
-							  <a href="?{{ query_params }}&page={{ page_obj.previous_page_number }}"><i class="ion-arrow-left-b"></i></a>
-							{% endif %}
-						
-							{% if page_obj.number > 1 %}
-								<a href="?{{ query_params }}&page=1">1</a>
-								{% if not page_obj.number == 2 and not page_obj.number == 3 and not page_obj.number == 4 %}
-								<span>...</span>
-							  {% endif %}
-							{% endif %}
-						
-							{% if page_obj.number|add:'-2' > 1 %}
-							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'-2' }}">{{ page_obj.number|add:'-2' }}</a>
-							{% endif %}
-							{% if page_obj.number|add:'-1' > 1 %}
-							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'-1' }}">{{ page_obj.number|add:'-1' }}</a>
-							{% endif %}
-						
-							<a class="active" href="?{{ query_params }}&page={{ page_obj.number }}">{{ page_obj.number }}</a>
-						
-							{% if page_obj.number|add:'1' <= page_obj.paginator.num_pages %}
-							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'1' }}">{{ page_obj.number|add:'1' }}</a>
-							{% endif %}
-							{% if page_obj.number|add:'2' <= page_obj.paginator.num_pages %}
-							  <a href="?{{ query_params }}&page={{ page_obj.number|add:'2' }}">{{ page_obj.number|add:'2' }}</a>
-							{% endif %}
-						
-							{% if page_obj.number < page_obj.paginator.num_pages %}
-							{% if page_obj.number < page_obj.paginator.num_pages|add:'-5' %}
-							  <span>...</span>
-							{% endif %}
-							
-							{% if not page_obj.number == page_obj.paginator.num_pages|add:'-2' %}
-							  {% if page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
-								<a href="?{{ query_params }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
-							  {% endif %}
-							{% endif %}
-						  {% endif %}
-						
-							{% if page_obj.has_next %}
-							  <a href="?{{ query_params }}&page={{ page_obj.next_page_number }}"><i class="ion-arrow-right-b"></i></a>
-							{% endif %}
+						  	</div>
+						  	{% if page_obj.paginator.num_pages > 1 %}
+						  		<div class="pagination2">
+									<span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} :</span>
+								
+									{% if page_obj.has_previous %}
+									<a href="?{{ query_params }}&page={{ page_obj.previous_page_number }}"><i class="ion-arrow-left-b"></i></a>
+									{% endif %}
+								
+									{% if page_obj.number > 1 %}
+										<a href="?{{ query_params }}&page=1">1</a>
+										{% if not page_obj.number == 2 and not page_obj.number == 3 and not page_obj.number == 4 %}
+											<span>...</span>
+										{% endif %}
+									{% endif %}
+								
+									{% if page_obj.number|add:'-2' > 1 %}
+										<a href="?{{ query_params }}&page={{ page_obj.number|add:'-2' }}">{{ page_obj.number|add:'-2' }}</a>
+									{% endif %}
+									{% if page_obj.number|add:'-1' > 1 %}
+										<a href="?{{ query_params }}&page={{ page_obj.number|add:'-1' }}">{{ page_obj.number|add:'-1' }}</a>
+									{% endif %}
+								
+									<a class="active" href="?{{ query_params }}&page={{ page_obj.number }}">{{ page_obj.number }}</a>
+								
+									{% if page_obj.number|add:'1' <= page_obj.paginator.num_pages %}
+										<a href="?{{ query_params }}&page={{ page_obj.number|add:'1' }}">{{ page_obj.number|add:'1' }}</a>
+									{% endif %}
 
-
-						  </div>
-						{% endif %}
+									{% if page_obj.number|add:'2' <= page_obj.paginator.num_pages %}
+										<a href="?{{ query_params }}&page={{ page_obj.number|add:'2' }}">{{ page_obj.number|add:'2' }}</a>
+									{% endif %}
+								
+									{% if page_obj.number < page_obj.paginator.num_pages %}
+										{% if page_obj.number < page_obj.paginator.num_pages|add:'-5' %}
+											<span>...</span>
+										{% endif %}
+									
+										{% if not page_obj.number == page_obj.paginator.num_pages|add:'-2' %}
+											{% if page_obj.number < page_obj.paginator.num_pages|add:'-1' %}
+												<a href="?{{ query_params }}&page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+											{% endif %}
+										{% endif %}
+									{% endif %}
+								
+									{% if page_obj.has_next %}
+										<a href="?{{ query_params }}&page={{ page_obj.next_page_number }}"><i class="ion-arrow-right-b"></i></a>
+									{% endif %}
+								</div>
+							{% endif %}
 
 				</div>
 				<div class="col-md-3 col-xs-12 col-sm-12">
 					<div class="sidebar">
 						<div class="searh-form">
-							<h4 class="sb-title">Search celebrity</h4>
+							<h4 class="sb-title">جستجوی صلبریتی</h4>
 							<form class="form-style-1 celebrity-form" action="{% url 'cast:search_celebrity' %}" method="get">
 								<div class="col-md-12 form-it">
-									<label>Celebrity Name : </label>
+									<label>نام صلبریتی : </label>
 									<input type="text" name="celebrity_name" placeholder="Enter celebrity name">
 								</div>
 								<div class="col-md-12 form-it">
-									<label>Celebrity Letter : </label>
+									<label>حرف صلبریتی :</label>
 									<select name="celebrity_letter">
-										<option value="">All</option>
+										<option value="">همه</option>
 										{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
 											<option value="{{ letter }}">{{ letter }}</option>
 										{% endfor %}
 									</select>
 								</div>
 								<div class="col-md-12 form-it">
-									<label>Celebrities : </label>
+									<label>صلبریتی ها : </label>
 									<select name="celebrity_type">
 										<option value="all">همه</option>
 										<option value="actor">بازیگران</option>
