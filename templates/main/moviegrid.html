@@ -42,6 +42,24 @@
 		padding: 5px;
 		border-radius: 5px;
 	}
+
+	.pagination2 {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		list-style: none;
+		order: 1; 
+	}
+	.pagination2 > a,
+	.pagination2 > span {
+		padding: 6px 12px;
+		margin: 0 4px;
+		line-height: 1.42857143;
+		color: #0089ff;
+		background-color: #fff;
+		border: 1px solid #ddd;
+		cursor: pointer;
+	  }
 	
 
 </style>
@@ -88,12 +106,12 @@
 					<label>مرتب سازی بر اساس :</label>
 					<form method="get">
 						<select name="filter_by" onchange="this.form.submit()">
-						  <option value="popularity_asc" {% if filter_order == 'popularity_asc' %}selected{% endif %}>محبوبیت - صعودی</option>
-						  <option value="popularity_desc" {% if filter_order == 'popularity_desc' %}selected{% endif %}>محبوبیت - نزولی</option>
-						  <option value="rating_asc" {% if filter_order == 'rating_asc' %}selected{% endif %}>امتیاز - صعودی</option>
-						  <option value="rating_desc" {% if filter_order == 'rating_desc' %}selected{% endif %}>امتیاز - نزولی</option>
-						  <option value="date_asc" {% if filter_order == 'date_asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
-						  <option value="date_desc" {% if filter_order == 'date_desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
+						  <option value="popularity" {% if filter_by == 'popularity_asc' %}selected{% endif %}>محبوبیت - صعودی</option>
+						  <option value="popularity" {% if filter_by == 'popularity_desc' %}selected{% endif %}>محبوبیت - نزولی</option>
+						  <option value="rating" {% if filter_by == 'rating_asc' %}selected{% endif %}>امتیاز - صعودی</option>
+						  <option value="rating" {% if filter_by == 'rating_desc' %}selected{% endif %}>امتیاز - نزولی</option>
+						  <option value="date" {% if filter_by == 'date_asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
+						  <option value="date" {% if filter_by == 'date_desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
 						</select>
 					  </form>
 					  
@@ -101,58 +119,38 @@
 					<a  href="moviegrid.html" class="grid"><i class="ion-grid active"></i></a>
 				</div>
 				<!-- در فایل moviegrid.html -->
-				{% for data in categorized_movies %}
-					<div class="flex-wrap-movielist">
-						{% for movie in data.movies %}
-							<div class="movie-item-style-2 movie-item-style-1">
-								<a href="{% url 'category:category_list' data.category.slug  %}">
-									<img src="{{ movie.poster }}" alt="{{ movie.title }}" width="200" height="350">
+				<div class="flex-wrap-movielist">
+					{% for movie in categorized_movies %}
+						<div class="movie-item-style-2 movie-item-style-1">
+							<a href="{% url 'category:category_list' movie.slug %}">
+								<img src="{{ movie.poster }}" class="card-img-top" alt="{{ movie.title }}">
+							</a> 
+							<div class="hvr-inner">
+								<a href="{% url 'category:category_list' movie.slug %}">
+									<h6 class='carousel-title'><a class='carousel-title' href="{% url 'category:category_list' movie.slug %}">
+										{{ movie.title }}
+										{{ movie.release_date|date:"Y" }}
+									</a></h6><i class="ion-android-arrow-dropright"></i>
 								</a>
-								<div class="hvr-inner">
-									<a href="{% url 'category:category_list' data.category.slug %}">
-										<h6 class='carousel-title'><a class='carousel-title' href="{% url 'category:category_list' data.category.slug %}">
-											{{ movie.title }}
-											{{ movie.release_date }}
-										</a></h6><i class="ion-android-arrow-dropright"></i>
-									</a>
-								</div>
-								<div class="title-in">
-									{% if movie.imdb_rating %}
-										<p class='crasol-rat'><i class="fab fa-imdb"></i>
-											<span>{{ movie.imdb_rating }}</span>
-										</p>
-									{% else %}
-										<p class='crasol-rat'><i class="ion-android-star"></i>
-											<span>N/A</span>
-										</p>
-									{% endif %}
-								</div>
 							</div>
-						{% endfor %}
-					</div>
-				{% endfor %}
+							<div class="title-in">
+								{% if movie.imdb_rating %}
+									<p class='crasol-rat'><i class="fab fa-imdb"></i>
+										<span>{{ movie.imdb_rating|floatformat:1 }}</span>
+									</p>
+								{% else %}
+									<p class='crasol-rat'><i class="ion-android-star"></i>
+										<span>N/A</span>
+									</p>
+								{% endif %}
+							</div>
+						</div>
+					{% endfor %}
+				</div>
 
 				
 				
 					
-				{% comment %} <div class="topbar-filter">
-					<label>Movies per page:</label>
-					<select>
-						<option value="range">20 Movies</option>
-						<option value="saab">10 Movies</option>
-					</select>
-					
-					<div class="pagination2">
-						<span>Page 1 of 2:</span>
-						<a class="active" href="#">1</a>
-						<a href="#">2</a>
-						<a href="#">3</a>
-						<a href="#">...</a>
-						<a href="#">78</a>
-						<a href="#">79</a>
-						<a href="#"><i class="ion-arrow-right-b"></i></a>
-					</div>
-				</div> {% endcomment %}
 				{% if page_obj.paginator.num_pages > 1 %}
 					<div class="pagination2">
 						<span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} :</span>
@@ -202,6 +200,9 @@
 						{% endif %}
 					</div>
 				{% endif %}
+
+
+
 			</div>
 			<div class="col-md-4 col-sm-12 col-xs-12">
 				<div class="sidebar">
@@ -218,10 +219,10 @@
 									<label>ژانر</label>
 									<div class="group-ip">
 									  <select name="genre" multiple="" class="ui fluid dropdown">
-										<option value="" disabled selected>همه</option>
-											{% for genre in genres %}
-												<option value="{{ genre }}">{{ genre }}</option>
-											{% endfor %}
+										{% for genre in genres %}
+										<option value="">-- انتخاب کنید --</option>
+										  <option value="{{ genre }}">{{ genre }}</option>
+										{% endfor %}
 									  </select>
 									</div>
 								  </div>

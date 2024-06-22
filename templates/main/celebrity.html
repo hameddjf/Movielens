@@ -1,57 +1,43 @@
 {% extends "main/base.html" %}
 {% load static %}
 {% block main %}
-<script>
-	window.onload = function() {
-		var select = document.querySelector('select[name="filter_by"]');
-	  
-		select.addEventListener('change', function() {
-			localStorage.setItem('selected_option', this.value);
-		});
-	  
-		var selectedOption = localStorage.getItem('selected_option');
-	  
-		if (selectedOption) {
-			select.value = selectedOption;
-		}
-	};
-</script>
+
 <style>
 	.celebrity-grid {
 		display: flex;
 		flex-wrap: wrap;
 		margin: -15px; 
-	  }
+	}
 	  
-	  .celebrity-item {
+	.celebrity-item {
 		flex: 0 0 33.333%; 
 		max-width: 33.333%;
 		padding: 15px; 
 		box-sizing: border-box;
-	  }
+	}
 	  
-	  .celebrity-item img {
+	.celebrity-item img {
 		width: 100%;
 		height: auto;
 		display: block;
-	  }
+	}
 	  
-	  .celebrity-info {
+	.celebrity-info {
 		text-align: center; 
 	  }
 
-	  .pagination-container {
+	.pagination-container {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		margin: 20px 0;
 	  }
 	  
-	  .pagination-info {
+	.pagination-info {
 		order: 2; 
 	  }
 	  
-	  .pagination2 {
+	.pagination2 {
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -59,8 +45,8 @@
 		order: 1; 
 	  }
 	  
-	  .pagination2 > a,
-	  .pagination2 > span {
+	.pagination2 > a,
+	.pagination2 > span {
 		padding: 6px 12px;
 		margin: 0 4px;
 		line-height: 1.42857143;
@@ -70,11 +56,11 @@
 		cursor: pointer;
 	  }
 	  
-	  .pagination2 > a:hover {
+	.pagination2 > a:hover {
 		background-color: #eee;
 	  }
 	  
-	  .pagination2 > a.active {
+	.pagination2 > a.active {
 		color: #fff;
 		background-color: #337ab7;
 		border-color: #337ab7;
@@ -177,14 +163,33 @@
 						<label>مرتب سازی بر اساس : </label>
 						<form method="GET" action="{% url 'cast:celebrity_list' %}">
 							<select name="filter_by" onchange="this.form.submit()">
-								<option value="name" {% if filter_order == 'name_asc' %}selected{% endif %}>نام - صعودی</option>
-								<option value="name" {% if filter_order == 'name_desc' %}selected{% endif %}>نام - نزولی</option>
-								<option value="rating" {% if filter_order == 'rating_asc' %}selected{% endif %}>امتیاز - صعودی</option>
-								<option value="rating" {% if filter_order == 'rating_desc' %}selected{% endif %}>امتیاز - نزولی</option>
-								<option value="date" {% if filter_order == 'date_asc' %}selected{% endif %}>تاریخ انتشار - صعودی</option>
-								<option value="date" {% if filter_order == 'date_desc' %}selected{% endif %}>تاریخ انتشار - نزولی</option>
+							  <option value="name" {% if filter_by == 'name_asc' %}selected{% endif %}>نام - صعودی</option>
+							  <option value="name" {% if filter_by == 'name_desc' %}selected{% endif %}>نام - نزولی</option>
+
+							  <option value="rating" {% if filter_by == 'rating_asc' %}selected{% endif %}>امتیاز - صعودی</option>
+							  <option value="rating" {% if filter_by == 'rating_desc' %}selected{% endif %}>امتیاز - نزولی</option>
+
+							  <option value="date" {% if filter_by == 'date_asc' %}selected{% endif %}>تاریخ - صعودی</option>
+							  <option value="date" {% if filter_by == 'date_desc' %}selected{% endif %}>تاریخ - نزولی</option>
 							</select>
-						</form>
+
+						  </form>
+						
+						<script>
+							window.onload = function() {
+								var select = document.querySelector('select[name="filter_by"]');
+							
+								select.addEventListener('change', function() {
+									localStorage.setItem('selected_option', this.value);
+								});
+							
+								var selectedOption = localStorage.getItem('selected_option');
+							
+								if (selectedOption) {
+									select.value = selectedOption;
+								}
+							};
+						</script>
 						<a href="celebritygrid01.html" class="grid"><i class="ion-grid active"></i></a>
 						</div>
 						<div class="celebrity-grid">
@@ -269,17 +274,18 @@
 							{% endif %}
 
 				</div>
-				<div class="col-md-3 col-xs-12 col-sm-12">
+				<div class="col-md-3 col-sm-12 col-xs-12">
 					<div class="sidebar">
 						<div class="searh-form">
 							<h4 class="sb-title">جستجوی صلبریتی</h4>
 							<form class="form-style-1 celebrity-form" action="{% url 'cast:search_celebrity' %}" method="get">
+								{% csrf_token %}
 								<div class="col-md-12 form-it">
-									<label>نام صلبریتی : </label>
+									<label>نام صلبریتی  </label>
 									<input type="text" name="celebrity_name" placeholder="Enter celebrity name">
 								</div>
 								<div class="col-md-12 form-it">
-									<label>حرف صلبریتی :</label>
+									<label>اولین حرف </label>
 									<select name="celebrity_letter">
 										<option value="">همه</option>
 										{% for letter in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' %}
@@ -288,7 +294,7 @@
 									</select>
 								</div>
 								<div class="col-md-12 form-it">
-									<label>صلبریتی ها : </label>
+									<label>صلبریتی : </label>
 									<select name="celebrity_type">
 										<option value="all">همه</option>
 										<option value="actor">بازیگران</option>
@@ -300,44 +306,7 @@
 							  	</div>
 								</div>
 							</form>
-							{% comment %} {% for celebrity in celebrities %}
-								<p>{{ celebrity.name }}</p>
-							{% endfor %} {% endcomment %}
 						  </div>
-						{% comment %} <div class="ads">
-							<img src="images/uploads/ads1.png" alt="">
-						</div> {% endcomment %}
-						{% comment %} <div class="celebrities">
-							<h4 class="sb-title">featured celebrity</h4>
-							<div class="celeb-item">
-								<a href="#"><img src="images/uploads/ava1.jpg" alt=""></a>
-								<div class="celeb-author">
-									<h6><a href="#">Samuel N. Jack</a></h6>
-									<span>Actor</span>
-								</div>
-							</div>
-							<div class="celeb-item">
-								<a href="#"><img src="images/uploads/ava2.jpg" alt=""></a>
-								<div class="celeb-author">
-									<h6><a href="#">Benjamin Carroll</a></h6>
-									<span>Actor</span>
-								</div>
-							</div>
-							<div class="celeb-item">
-								<a href="#"><img src="images/uploads/ava3.jpg" alt=""></a>
-								<div class="celeb-author">
-									<h6><a href="#">Beverly Griffin</a></h6>
-									<span>Actor</span>
-								</div>
-							</div>
-							<div class="celeb-item">
-								<a href="#"><img src="images/uploads/ava4.jpg" alt=""></a>
-								<div class="celeb-author">
-									<h6><a href="#">Justin Weaver</a></h6>
-									<span>Actor</span>
-								</div>
-							</div> 
-						</div>{% endcomment %}
 					</div>
 				</div>
 			</div>

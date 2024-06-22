@@ -14,9 +14,17 @@ class Actor(models.Model):
 
     movies = models.ManyToManyField(Movie, related_name='actors', blank=True,
                                     verbose_name=_('فیلم‌های کارگردان'))
+    popularity = models.DecimalField(
+        _("معروفیت"), max_digits=5, decimal_places=2, null=True, blank=True)
+    movie_count = models.PositiveIntegerField(
+        _("تعداد فیلم‌ها"), null=True, blank=True)
 
     def get_role(self):
         return 'actor'
+
+    @property
+    def average_rating(self):
+        return self.imdb_rating
 
     class Meta:
         verbose_name = _("بازیگر")
@@ -35,9 +43,17 @@ class Director(models.Model):
     movies = models.ManyToManyField(Movie, related_name='directors',
                                     blank=True,
                                     verbose_name=_('فیلم‌های کارگردان'))
+    popularity = models.DecimalField(
+        _("معروفیت"), max_digits=5, decimal_places=2, null=True, blank=True)
+    movie_count = models.PositiveIntegerField(
+        _("تعداد فیلم‌ها"), null=True, blank=True)
 
     def get_role(self):
         return 'director'
+
+    @property
+    def average_rating(self):
+        return self.imdb_rating
 
     class Meta:
         verbose_name = _("کارگردان")
